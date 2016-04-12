@@ -10,4 +10,4 @@ echo "filesize: $filesize"
 echo "downloding $url"
 (cd download && curl -O $url)
 
-echo "[{\"filename\":\"download/10142_3_MPRAGE_online.nii\", \"size\":$filesize}]" > products.json
+echo '[{"filename":"download/10142_3_MPRAGE_online.nii", "size":' $filesize '}]' > products.json
