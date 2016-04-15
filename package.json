@@ -1,5 +1,5 @@
 {
-  "name": "sca-service-curl",
+  "name": "sca-service-download",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,7 +15,7 @@
   "sca": {
     "label": "Curl",
     "bin": {
-        "run": "run.sh"
+        "run": "run.py"
     }
   }
 }
