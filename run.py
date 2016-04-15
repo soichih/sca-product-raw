@@ -11,6 +11,7 @@ block_sz = 8192*10
 with open('config.json') as config_json:
     config = json.load(config_json)
 
+products = []
 
 idx=0
 for file in config["download"]:
@@ -47,14 +48,19 @@ for file in config["download"]:
             progress_time = time.time()
             status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
             print status
+
         #status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
         #status = status + chr(8)*(len(status)+1) #what is this?
         #print status
 
     requests.post(progress_url, json={"progress": 1, "status": "finished"});
+    products.append({"filename": file_name, "size": file_size})
 
     f.close()
     idx+=1
+
+with open("products.json", "w") as fp:
+    json.dump(products, fp)
 
     #filesize=`curl -sI $url | grep Content-Length | cut -f 2 -d " "`
 #
