@@ -19,44 +19,49 @@ for file in config["download"]:
     dir=file["dir"]
     if not os.path.exists(dir):
         os.makedirs(dir)
-    
+
     url = file["url"]
-    u = urllib2.urlopen(url)
-    file_name = url.split('/')[-1]
-    f = open(dir+"/"+file_name, 'w')
-    meta = u.info()
-    file_size = int(meta.getheaders("Content-Length")[0])
-
     progress_url = os.environ["SCA_PROGRESS_URL"]+".file"+str(idx);
-    requests.post(progress_url, json={"status": "running", "progress": 0, "msg": "downloading "+url+" ("+str(file_size)+" bytes)"});
+    requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
+    try:
+        u = urllib2.urlopen(url)
+        file_name = url.split('/')[-1]
+        f = open(dir+"/"+file_name, 'w')
+        meta = u.info()
+        file_size = int(meta.getheaders("Content-Length")[0])
 
-    print "Downloading: %s Bytes: %s" % (file_name, file_size)
+        print "Downloading: %s Bytes: %s" % (file_name, file_size)
 
-    file_size_dl = 0
-    progress_time = time.time()
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
+        file_size_dl = 0
+        progress_time = time.time()
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
 
-        file_size_dl += len(buffer)
-        f.write(buffer)
+            file_size_dl += len(buffer)
+            f.write(buffer)
 
-        if time.time() - progress_time > 0.5:
-            #print time.time()
-            requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
-            progress_time = time.time()
-            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-            print status
+            if time.time() - progress_time > 0.5:
+                #print time.time()
+                requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
+                progress_time = time.time()
+                status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+                print status
 
-        #status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-        #status = status + chr(8)*(len(status)+1) #what is this?
-        #print status
+            #status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+            #status = status + chr(8)*(len(status)+1) #what is this?
+            #print status
 
-    requests.post(progress_url, json={"progress": 1, "status": "finished"});
-    products.append({"filename": file_name, "size": file_size})
+        requests.post(progress_url, json={"progress": 1, "status": "finished"});
+        products.append({"filename": file_name, "size": file_size})
 
-    f.close()
+        f.close()
+    except urllib2.HTTPError, e:
+        print "failed to download "+url
+        print e 
+        requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+
     idx+=1
 
 with open("products.json", "w") as fp:
