@@ -28,7 +28,14 @@ for file in config["download"]:
         file_name = url.split('/')[-1]
         f = open(dir+"/"+file_name, 'w')
         meta = u.info()
-        file_size = int(meta.getheaders("Content-Length")[0])
+
+        contentlength = meta.getheaders("Content-Length")
+        if len(contentlength) == 1:
+            file_size = int(meta.getheaders("Content-Length")[0])
+        else:
+            file_size = None
+            print "Content-Length not set.. can't figure out the final file size"
+            print meta
 
         print "Downloading: %s Bytes: %s" % (file_name, file_size)
 
@@ -44,9 +51,16 @@ for file in config["download"]:
 
             if time.time() - progress_time > 0.5:
                 #print time.time()
-                requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
+                if file_size:
+                    requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
+                else:
+                    requests.post(progress_url, json={"msg": "Downloaded "+str(file_size_dl)+ " -- total size unknown"})
+
                 progress_time = time.time()
-                status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+                if file_size:
+                    status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+                else:
+                    status = r"%10d" % (file_size_dl)
                 print status
 
             #status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
@@ -54,10 +68,11 @@ for file in config["download"]:
             #print status
 
         requests.post(progress_url, json={"progress": 1, "status": "finished"});
-        products.append({"filename": file_name, "size": file_size})
+        products.append({"filename": file_name, "size": file_size_dl})
 
         f.close()
-    except urllib2.HTTPError, e:
+    #except urllib2.HTTPError, e:
+    except Exception as e:
         print "failed to download "+url
         print e 
         requests.post(progress_url, json={"status": "failed", "msg": str(e)})
