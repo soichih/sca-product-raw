@@ -3,7 +3,7 @@
 
     //https://github.com/danialfarid/ng-file-upload
     var service = angular.module('sca-product-raw', [ ]);
-    service.directive('scaFiles', ['toaster', '$http', '$timeout', 
+    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 
     function(toaster, $http, $timeout) {
         return {
             restrict: 'E',

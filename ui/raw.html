@@ -10,13 +10,13 @@
     border-left: none;
     border-bottom: none;
 }
-.sca-files-folder {
+.sca-product-raw-folder {
     cursor: pointer;
 }
-.sca-files-file {
+.sca-product-raw-file {
     color: black;
 }
-sca-files .list-group-item {
+sca-product-raw .list-group-item {
 padding: 3px 10px;
 }
 </style>
@@ -26,7 +26,7 @@ padding: 3px 10px;
     <li class="list-group-item slide-down" ng-repeat="file in files">
         <div class="row">
             <!--- clean this up--->
-            <div class="col-md-6 sca-files-folder" ng-if="file.attrs.mode_string[0] == 'd'" ng-click="file.open = true">
+            <div class="col-md-6 sca-product-raw-folder" ng-if="file.attrs.mode_string[0] == 'd'" ng-click="file.open = true">
                 <span style="color: #008cba">
                     <i class="fa fa-folder" ng-if="!file.open"></i>
                     <i class="fa fa-folder-open" ng-if="file.open"></i>
@@ -35,7 +35,7 @@ padding: 3px 10px;
             </div>
             <div class="col-md-6" ng-if="file.attrs.mode_string[0] != 'd'">
                 <!--<i class="fa fa-file"></i>-->
-                <a class="sca-files-file" target="_blank" href="{{conf.sca_api}}/resource/download?r={{resourceid}}&p={{path+'/'+file.filename|encodeURI}}&at={{jwt}}">
+                <a class="sca-product-raw-file" target="_blank" href="{{conf.sca_api}}/resource/download?r={{resourceid}}&p={{path+'/'+file.filename|encodeURI}}&at={{jwt}}">
                     {{file.filename}}
                 </a>
             </div>
@@ -52,7 +52,7 @@ padding: 3px 10px;
             </div>
             <!--{{file|json}}-->
         </div>
-        <sca-files conf="conf" taskid="taskid" path="file.path" jwt="jwt" ng-if="file.open" class="list-group-nested"></ng-include>
+        <sca-product-raw conf="conf" taskid="taskid" path="file.path" jwt="jwt" ng-if="file.open" class="list-group-nested"></ng-include>
     </li>
 </ul>
 
