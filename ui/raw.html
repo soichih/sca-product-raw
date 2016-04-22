@@ -1,0 +1,59 @@
+<style>
+.list-group-nested .list-group {
+    margin-top: 3px;
+    margin-bottom: 0px;
+}
+.list-group-nested .list-group-item {
+    margin-right: 0px;
+    padding-right: 0px;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+.sca-files-folder {
+    cursor: pointer;
+}
+.sca-files-file {
+    color: black;
+}
+sca-files .list-group-item {
+padding: 3px 10px;
+}
+</style>
+<!--<p class="text-muted" ng-if="!resourceid">This task has not yet assigned to any resource. There is no output directory yet.</p>-->
+<ul class="list-group">
+    <li class="list-group-item slide-down" ng-if="files.length == 0"><span class="text-muted">(Empty)</span></li>
+    <li class="list-group-item slide-down" ng-repeat="file in files">
+        <div class="row">
+            <!--- clean this up--->
+            <div class="col-md-6 sca-files-folder" ng-if="file.attrs.mode_string[0] == 'd'" ng-click="file.open = true">
+                <span style="color: #008cba">
+                    <i class="fa fa-folder" ng-if="!file.open"></i>
+                    <i class="fa fa-folder-open" ng-if="file.open"></i>
+                </span>
+                {{file.filename}}
+            </div>
+            <div class="col-md-6" ng-if="file.attrs.mode_string[0] != 'd'">
+                <!--<i class="fa fa-file"></i>-->
+                <a class="sca-files-file" target="_blank" href="{{conf.sca_api}}/resource/download?r={{resourceid}}&p={{path+'/'+file.filename|encodeURI}}&at={{jwt}}">
+                    {{file.filename}}
+                </a>
+            </div>
+            <div class="col-md-2" style="text-align: right;">
+                <span ng-if="file.attrs.mode_string[0] != 'd'">
+                    {{file.attrs.size|bytes}}
+                </span>
+            </div>
+            <div class="col-md-2">
+                {{file.attrs.mtime*1000|date:'short'}}
+            </div>
+            <div class="col-md-2">
+                <pre style="font-size: 90%; border: none; background-color: inherit; margin: 0px;padding: 0px;">{{file.attrs.mode_string}}</pre>
+            </div>
+            <!--{{file|json}}-->
+        </div>
+        <sca-files conf="conf" taskid="taskid" path="file.path" jwt="jwt" ng-if="file.open" class="list-group-nested"></ng-include>
+    </li>
+</ul>
+
+

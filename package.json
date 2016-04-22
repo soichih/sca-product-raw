@@ -1,21 +1,21 @@
 {
-  "name": "sca-service-download",
+  "name": "sca-product-raw",
   "version": "1.0.0",
-  "description": "",
+  "description": "raw data product UI and importer (download, cp, etc..)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/soichih/sca-service-curl.git"
+    "url": "https://github.com/soichih/sca-product-raw.git"
   },
   "author": "Soichi Hayashi <hayashis@iu.edu>",
   "license": "ISC",
   "sca": {
-    "label": "Curl",
+    "label": "Raw data product",
     "bin": {
-        "run": "run.py"
+        "run": "import.py"
     }
   }
 }
