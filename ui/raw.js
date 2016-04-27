@@ -16,13 +16,15 @@
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
 
+                //TODO -I should probably use scaTask service 
                 load_task();
                 var t = null;
 
                 function load_task() {
-                    $http.get($scope.conf.sca_api+"/task/"+$scope.taskid)
+                    $http.get($scope.conf.sca_api+"/task/", {params: {where: {_id: $scope.taskid}}})
                     .then(function(res) {
-                        var task = res.data;
+                        var task = res.data[0];
+                        //console.dir(task);
                         if(!task.resource_id) {
                             //task doesn't have resource_id.. probably hasn't run yet.. reload later
                             t = $timeout(load_task, 1000);
