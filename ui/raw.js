@@ -42,18 +42,22 @@
                 }
 
                 function load_files() {
+                    $scope.loading = true;
                     $http.get($scope.conf.sca_api+"/resource/ls", {
+                        //timeout: 3000, //server side should handle this (with good explanation)
                         params: {
                             resource_id: $scope.resourceid,
                             path: $scope.path,
                         }
                     })
                     .then(function(res) {
+                        $scope.loading = false;
                         $scope.files = res.data.files;
                         $scope.files.forEach(function(file) {
                             file.path = $scope.path+"/"+file.filename;
                         });
                     }, function(res) {
+                        $scope.loading = false;
                         if(res.data && res.data.message) toaster.error(res.data.message);
                         else toaster.error(res.statusText);
                     });

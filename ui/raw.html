@@ -12,6 +12,7 @@
 }
 .sca-product-raw-folder {
     cursor: pointer;
+    color: black;
 }
 .sca-product-raw-file {
     color: black;
@@ -20,13 +21,14 @@ sca-product-raw .list-group-item {
 padding: 3px 10px;
 }
 </style>
+<p class="text-muted" ng-if="loading"><i class="fa fa-cog fa-spin"></i> Loading files...</p>
 <!--<p class="text-muted" ng-if="!resourceid">This task has not yet assigned to any resource. There is no output directory yet.</p>-->
 <ul class="list-group">
-    <li class="list-group-item slide-down" ng-if="files.length == 0"><span class="text-muted">(Empty)</span></li>
+    <li class="list-group-item" ng-if="files.length == 0"><span class="text-muted">(Empty)</span></li>
     <li class="list-group-item slide-down" ng-repeat="file in files">
         <div class="row">
             <!--- clean this up--->
-            <div class="col-md-6 sca-product-raw-folder" ng-if="file.attrs.mode_string[0] == 'd'" ng-click="file.open = true">
+            <div class="col-md-6 sca-product-raw-folder" ng-if="file.attrs.mode_string[0] == 'd'" ng-click="file.open = !file.open">
                 <span style="color: #008cba">
                     <i class="fa fa-folder" ng-if="!file.open"></i>
                     <i class="fa fa-folder-open" ng-if="file.open"></i>
@@ -50,9 +52,9 @@ padding: 3px 10px;
             <div class="col-md-2">
                 <pre style="font-size: 90%; border: none; background-color: inherit; margin: 0px;padding: 0px;">{{file.attrs.mode_string}}</pre>
             </div>
-            <!--{{file|json}}-->
         </div>
-        <sca-product-raw conf="conf" taskid="taskid" path="file.path" jwt="jwt" ng-if="file.open" class="list-group-nested"></ng-include>
+        <!--recurse-->
+        <sca-product-raw conf="conf" taskid="taskid" path="file.path" jwt="jwt" ng-if="file.open" class="list-group-nested"></sca-product-raw>
     </li>
 </ul>
 
