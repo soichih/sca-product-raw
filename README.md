@@ -10,15 +10,32 @@ You probably need to install "pip install request"
 * Input 
 
 config.json
+
 ```
 {
-    "download: [
-        {"url": "http://example.com/some/file.txt"},
-        {"url": "http://example.com/another/file.txt"},
+    "download": [
+        {"dir": "download", "url": "https://dl.dropboxusercontent.com/u/3209692/permanent/10142_3_MPRAGE_online.nii"},
+        {"dir": "download", "url": "http://broken_url.com"}
+    ],
+    "symlink": [
+        {"src": "/etc/issue"},
+        {"src": "/etc/fstab", "dest": "fstab.lnk"}
     ]
 }
 ```
 
-Upon execution, files will be downloaded under ./download
+Sample products.json
 
-TODO..  Report to progress service for each file downloaded (use filesize?)
+```
+[
+    {
+        "files": [
+            {"size": 21627232, "filename": "download/10142_3_MPRAGE_online.nii"}, 
+            {"filename": "issue"}, 
+            {"filename": "fstab.lnk"}
+        ], 
+        "type": "raw"
+    }
+]
+```
+
