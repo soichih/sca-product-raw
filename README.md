@@ -1,7 +1,9 @@
-# sca-service-curl
-Curl downloader service for SCA.
 
-It simply downloads files listed in the config.json via curl and create products.json for files successfully downloaded
+SCA raw data type 
+
+## import.py
+
+If executed as SCA service, this service will download files listed and create products.json for files successfully downloaded. Download progress will be posted to SCA_PROGRESS_URL
 
 * Installation
 
