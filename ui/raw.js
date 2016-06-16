@@ -3,8 +3,8 @@
 
     //https://github.com/danialfarid/ng-file-upload
     var service = angular.module('sca-product-raw', [ ]);
-    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 
-    function(toaster, $http, $timeout) {
+    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 'scaTask',
+    function(toaster, $http, $timeout, scaTask) {
         return {
             restrict: 'E',
             scope: {
@@ -16,12 +16,29 @@
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
 
+                var file_timeout;
+                $scope.t = scaTask.get($scope.taskid);
+                /*
+                $scope.t._promise.then(function() {
+                    if(!$scope.t.resource_id) {
+                        console.log("task doesn't have resource_id.. probably hasn't run yet.. reload later");
+                        file_timeout = $timeout(load_task, 1000);
+                    } else {
+                        console.log("we have resource! now display!");
+                        $scope.resourceid = task.resource_id;
+                        $scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
+                        load_files();
+                    }
+               });
+               */
+
+                /*
                 //TODO -I should probably use scaTask service 
                 load_task();
                 var t = null;
 
                 function load_task() {
-                    $http.get($scope.conf.sca_api+"/task/", {params: {where: {_id: $scope.taskid}}})
+                    $http.get($scope.conf.sca_api+"/task/", {params: {find: {_id: $scope.taskid}}})
                     .then(function(res) {
                         var task = res.data[0];
                         //console.dir(task);
@@ -40,30 +57,35 @@
                         else toaster.error(res.statusText);
                     });
                 }
-
-                function load_files() {
-                    $scope.loading = true;
-                    $http.get($scope.conf.sca_api+"/resource/ls", {
-                        //timeout: 3000, //server side should handle this (with good explanation)
-                        params: {
-                            resource_id: $scope.resourceid,
-                            path: $scope.path,
-                        }
-                    })
-                    .then(function(res) {
-                        $scope.loading = false;
-                        $scope.files = res.data.files;
-                        $scope.files.forEach(function(file) {
-                            file.path = $scope.path+"/"+file.filename;
+                */
+                $scope.$watch('t', function() {
+                    //reload files if resource_id is set
+                    if($scope.t.resource_id) {
+                        $scope.loading = true;
+                        $scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
+                        $http.get($scope.conf.sca_api+"/resource/ls", {
+                            //timeout: 3000, //server side should handle this (with good explanation)
+                            params: {
+                                resource_id: $scope.t.resource_id,
+                                path: $scope.path,
+                            }
+                        })
+                        .then(function(res) {
+                            $scope.loading = false;
+                            $scope.files = res.data.files;
+                            $scope.files.forEach(function(file) {
+                                file.path = $scope.path+"/"+file.filename;
+                            });
+                        }, function(res) {
+                            $scope.loading = false;
+                            if(res.data && res.data.message) toaster.error(res.data.message);
+                            else toaster.error(res.statusText);
                         });
-                    }, function(res) {
-                        $scope.loading = false;
-                        if(res.data && res.data.message) toaster.error(res.data.message);
-                        else toaster.error(res.statusText);
-                    });
-                }
+                    }
+                });
+
                 $scope.$on("$destroy", function(event) {
-                    if(t) $timeout.cancel(t);
+                    if(file_timeout) $timeout.cancel(file_timeout);
                 });
 
                 /*

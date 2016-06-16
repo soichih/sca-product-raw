@@ -33,6 +33,7 @@ sca-product-raw .list-group-item {
 padding: 3px 10px;
 }
 </style>
+<p class="text-muted" ng-if="t.resource_id === undefined"><i class="fa fa-hourglass-start"></i> {{t.status_msg}}</p>
 <p class="text-muted" ng-if="loading"><i class="fa fa-cog fa-spin"></i> Loading files...</p>
 <!--<p class="text-muted" ng-if="!resourceid">This task has not yet assigned to any resource. There is no output directory yet.</p>-->
 <ul class="list-group">
@@ -49,7 +50,7 @@ padding: 3px 10px;
             </div>
             <div class="col-md-6" ng-if="file.attrs.mode_string[0] != 'd'">
                 <!--<i class="fa fa-file"></i>-->
-                <a class="sca-product-raw-file" target="_blank" href="{{conf.sca_api}}/resource/download?r={{resourceid}}&p={{path+'/'+file.filename|encodeURI}}&at={{jwt}}">
+                <a class="sca-product-raw-file" target="_blank" href="{{conf.sca_api}}/resource/download?r={{t.resource_id}}&p={{path+'/'+file.filename|encodeURI}}&at={{jwt}}">
                     {{file.filename}}
                 </a>
             </div>
