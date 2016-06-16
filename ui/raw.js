@@ -3,18 +3,18 @@
 
     //https://github.com/danialfarid/ng-file-upload
     var service = angular.module('sca-product-raw', [ ]);
-    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 'scaTask',
-    function(toaster, $http, $timeout, scaTask) {
+    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 'scaTask', 'appconf',
+    function(toaster, $http, $timeout, scaTask, appconf) {
         return {
             restrict: 'E',
             scope: {
                 taskid: '=',
                 path: '=', //if empty, it will be set to instantce_id / task_id
-                jwt: '=',
-                conf: '=', //need sca_api set
             }, 
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
+                $scope.jwt = localStorage.getItem(appconf.jwt_id);
+                $scope.appconf = appconf; //used by template
 
                 var file_timeout;
                 $scope.t = scaTask.get($scope.taskid);
@@ -63,7 +63,7 @@
                     if($scope.t.resource_id) {
                         $scope.loading = true;
                         $scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
-                        $http.get($scope.conf.sca_api+"/resource/ls", {
+                        $http.get(appconf.sca_api+"/resource/ls", {
                             //timeout: 3000, //server side should handle this (with good explanation)
                             params: {
                                 resource_id: $scope.t.resource_id,
