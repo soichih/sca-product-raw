@@ -9,7 +9,7 @@
             restrict: 'E',
             scope: {
                 taskid: '=',
-                path: '=', //if empty, it will be set to instantce_id / task_id
+                path: '=?', //if empty, it will be set to instantce_id / task_id
             }, 
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
