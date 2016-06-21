@@ -9,65 +9,28 @@
             restrict: 'E',
             scope: {
                 taskid: '=',
-                path: '=?', //if empty, it will be set to instantce_id / task_id
+                path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             }, 
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
                 $scope.jwt = localStorage.getItem(appconf.jwt_id);
                 $scope.appconf = appconf; //used by template
+                if(!$scope.path) $scope.path = "";
 
                 var file_timeout;
                 $scope.t = scaTask.get($scope.taskid);
-                /*
                 $scope.t._promise.then(function() {
-                    if(!$scope.t.resource_id) {
-                        console.log("task doesn't have resource_id.. probably hasn't run yet.. reload later");
-                        file_timeout = $timeout(load_task, 1000);
-                    } else {
-                        console.log("we have resource! now display!");
-                        $scope.resourceid = task.resource_id;
-                        $scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
-                        load_files();
-                    }
-               });
-               */
+                    $scope.taskdir = $scope.t.instance_id+"/"+$scope.t._id;
 
-                /*
-                //TODO -I should probably use scaTask service 
-                load_task();
-                var t = null;
-
-                function load_task() {
-                    $http.get($scope.conf.sca_api+"/task/", {params: {find: {_id: $scope.taskid}}})
-                    .then(function(res) {
-                        var task = res.data[0];
-                        //console.dir(task);
-                        if(!task.resource_id) {
-                            //task doesn't have resource_id.. probably hasn't run yet.. reload later
-                            t = $timeout(load_task, 1000);
-                            
-                        } else {
-                            //we have resource! now display!
-                            $scope.resourceid = task.resource_id;
-                            $scope.path = $scope.path || task.instance_id+"/"+task._id;
-                            load_files();
-                        }
-                    }, function(res) {
-                        if(res.data && res.data.message) toaster.error(res.data.message);
-                        else toaster.error(res.statusText);
-                    });
-                }
-                */
-                $scope.$watch('t', function() {
                     //reload files if resource_id is set
                     if($scope.t.resource_id) {
                         $scope.loading = true;
-                        $scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
-                        $http.get(appconf.sca_api+"/resource/ls", {
+                        //$scope.path = $scope.path || $scope.t.instance_id+"/"+$scope.t._id;
+                        //$scope.path = $scope.t.instance_id+"/"+$scope.t._id;
+                        $http.get(appconf.sca_api+"/resource/ls/"+$scope.t.resource_id, {
                             //timeout: 3000, //server side should handle this (with good explanation)
                             params: {
-                                resource_id: $scope.t.resource_id,
-                                path: $scope.path,
+                                path: $scope.taskdir+"/"+$scope.path,
                             }
                         })
                         .then(function(res) {
@@ -81,20 +44,14 @@
                             if(res.data && res.data.message) toaster.error(res.data.message);
                             else toaster.error(res.statusText);
                         });
+                    } else {
+                        console.log("resource_id not loaded yet..");
                     }
                 });
 
                 $scope.$on("$destroy", function(event) {
                     if(file_timeout) $timeout.cancel(file_timeout);
                 });
-
-                /*
-                $scope.$watch('resourceid', function() {
-                    //console.log("resource id set to "+$scope.resourceid);
-                    if(!$scope.resourceid) return;
-                    load_files();
-                });
-                */
             }
         };
     }]);
