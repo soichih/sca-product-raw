@@ -1,0 +1,49 @@
+<!--no child files-->
+
+<div ng-if="$ctrl.files.length == 0" 
+    style="padding-left: {{$ctrl.indent}}em"
+    class="text-muted slide-down">Empty</div>
+
+<div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-item">
+    <div 
+        ng-if="file.attrs.mode_string[0] != '-'"
+        ng-click="file.open = !file.open"
+        style="padding-left: {{$ctrl.indent}}em"
+        class="sca-product-raw-folder">
+        <span style="color: #008cba">
+            <i class="fa fa-folder" ng-if="!file.open"></i>
+            <i class="fa fa-folder-open" ng-if="file.open"></i>
+        </span>
+        {{file.filename}}
+    </div>
+    <div 
+        uib-tooltip="{{file.longname}}" tooltip-popup-delay="300"
+        ng-if="file.attrs.mode_string[0] == '-'"
+        style="padding-left: {{$ctrl.indent}}em"
+        class="sca-product-raw-file">
+        <a class="sca-product-raw-file" target="_blank" href="{{file.url}}">
+            <i class="fa fa-file-o text-muted"></i>
+            {{file.filename}}
+        </a>
+    </div>
+
+    <!--
+    <time class="pull-right" style="width: 120px">
+        {{file.attrs.mtime*1000|date:'short'}}
+    </time>
+    -->
+    <!--
+    <div class="pull-right">
+        <pre style="font-size: 90%; border: none; background-color: inherit; margin: 0px;padding: 0px;">{{file.attrs.mode_string}}</pre>
+    </div>
+    -->
+    <!--
+    <div class="pull-right" style="text-align: right; width: 120px" ng-if="file.attrs.mode_string[0] == '-'">
+        <span ng-if="file.attrs.mode_string[0] != 'd'">
+            {{file.attrs.size|bytes}}
+        </span>
+    </div>
+    -->
+</div>
+<sca-product-raw-dir ng-repeat-end indent="$ctrl.indent+1" taskid="$ctrl.taskid" path="file.path" ng-if="file.open"></sca-product-raw-dir>
+

@@ -1,71 +1,24 @@
 <style>
-.list-group-nested .list-group {
-    margin-top: 3px;
-    margin-bottom: 0px;
+sca-product-raw .sca-product-raw-item {
+padding: 0px 5px;
 }
-.list-group-nested .list-group-item {
-    margin-right: 0px;
-    padding-right: 0px;
-    border-right: none;
-    border-left: none;
-    border-bottom: none;
-}
-.sca-product-raw-folder {
-    color: black;
-}
-.sca-product-raw-folder:hover {
+sca-product-raw .sca-product-raw-item:hover {
+    background-color: #ddd;
     cursor: pointer;
-    color:  #008cba;
 }
-.sca-product-raw-file {
-    color: black;
-}
-.sca-product-raw-file:hover {
-    color:  #008cba;
+
+sca-product-raw .sca-product-raw-item a {
     text-decoration: none;
 }
-/*
-.sca-product-raw-file:hover {
-    color:  #008cba;
-}
-*/
-sca-product-raw .list-group-item {
-padding: 3px 10px;
+sca-product-raw {
+font-size: 95%;
+border: 1px solid #ddd;
+display: block;
+padding: 10px;
+border-radius: 5px;
 }
 </style>
-<p class="text-muted" ng-if="!t.resource_id"><i class="fa fa-hourglass-start"></i> {{t.status_msg}}</p>
-<p class="text-muted" ng-if="loading"><i class="fa fa-cog fa-spin"></i> Loading files...</p>
-<ul class="list-group">
-    <li class="list-group-item" ng-if="files.length == 0"><span class="text-muted">(Empty)</span></li>
-    <li class="list-group-item slide-down" ng-repeat="file in files">
-        <div class="row">
-            <div class="col-md-6 sca-product-raw-folder" ng-if="file.attrs.mode_string[0] != '-'" ng-click="file.open = !file.open">
-                <span style="color: #008cba">
-                    <i class="fa fa-folder" ng-if="!file.open"></i>
-                    <i class="fa fa-folder-open" ng-if="file.open"></i>
-                </span>
-                {{file.filename}}
-            </div>
-            <div class="col-md-6" ng-if="file.attrs.mode_string[0] == '-'">
-                <a class="sca-product-raw-file" target="_blank" href="{{appconf.sca_api}}/resource/download?r={{t.resource_id}}&p={{taskdir+'/'+file.path|encodeURI}}&at={{jwt}}">
-                    {{file.filename}}
-                </a>
-            </div>
-            <div class="col-md-2" style="text-align: right;">
-                <span ng-if="file.attrs.mode_string[0] != 'd'">
-                    {{file.attrs.size|bytes}}
-                </span>
-            </div>
-            <div class="col-md-2">
-                {{file.attrs.mtime*1000|date:'short'}}
-            </div>
-            <div class="col-md-2">
-                <pre style="font-size: 90%; border: none; background-color: inherit; margin: 0px;padding: 0px;">{{file.attrs.mode_string}}</pre>
-            </div>
-        </div>
-        <!--recurse-->
-        <sca-product-raw taskid="taskid" path="file.path" ng-if="file.open" class="list-group-nested"></sca-product-raw>
-    </li>
-</ul>
-
+<!--<p class="text-muted" ng-if="!t.resource_id"><i class="fa fa-hourglass-start"></i> {{t.status_msg}}</p>-->
+<p class="text-muted" ng-if="$ctrl.loading"><i class="fa fa-cog fa-spin"></i> Loading files...</p>
+<sca-product-raw-dir indent="0 "taskid="taskid" path="path"></sca-product-raw-dir>
 
