@@ -5,6 +5,7 @@ import urllib2
 import requests
 import time
 import errno
+import tarfile
 
 block_sz = 8192*10
 
@@ -13,7 +14,7 @@ with open('config.json') as config_json:
 
 products = []
 
-#handle download requests
+#download remote file via urllib2
 if "download" in config:
     for file in config["download"]:
 
@@ -72,7 +73,6 @@ if "download" in config:
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
-#handle symlink requests
 #symlink files from local directory to task directory
 if "symlink" in config:
     for file in config["symlink"]:
@@ -95,6 +95,24 @@ if "symlink" in config:
         except Exception as e:
             print "failed to symlink:"+src
             print e 
+
+#create tar file from local directory 
+if "tar" in config:
+    for file in config["tar"]:
+        print "Handling targz request from",file["src"],"to",file["dest"]
+        src = file["src"]
+        dest = file["dest"]
+
+        #taropt can be "gz" or "bz2"..
+        taropt = ""
+        if "opts" in file:
+            taropt = file["opts"]
+
+        #now create tar file
+        tar = tarfile.open(dest, "w:"+taropt)
+        tar.add(src, arcname=os.path.basename(src))
+        products.append({"filename": dest})
+        tar.close()
 
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)

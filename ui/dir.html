@@ -4,6 +4,10 @@
     style="padding-left: {{$ctrl.indent}}em"
     class="text-muted slide-down">Empty</div>
 
+<div ng-if="$ctrl.loading"
+    style="padding-left: {{$ctrl.indent}}em"
+    class="text-muted"><i class="fa fa-cog fa-spin"></i> Loading</div>
+
 <div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-item">
     <div 
         ng-if="file.attrs.mode_string[0] != '-'"
