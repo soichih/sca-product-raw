@@ -99,9 +99,9 @@ if "symlink" in config:
 #create tar file from local directory 
 if "tar" in config:
     for file in config["tar"]:
-        print "Handling targz request from",file["src"],"to",file["dest"]
         src = file["src"]
         dest = file["dest"]
+        print "Handling targz request from",file["src"],"to",file["dest"]
 
         #taropt can be "gz" or "bz2"..
         taropt = ""
@@ -118,9 +118,9 @@ if "tar" in config:
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
 if "untar" in config:
     for file in config["untar"]:
-        print "Handling untar request from",file["src"],"to",file["dest"]
         src = file["src"]
         dest = file["dest"]
+        print "Handling untar request from",file["src"],"to",file["dest"]
 
         taropt = ""
         if "opts" in file:
