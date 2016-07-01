@@ -118,6 +118,7 @@ if "tar" in config:
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
 if "untar" in config:
     for file in config["untar"]:
+        print dir(file)
         src = file["src"]
         dest = file["dest"]
         print "Handling untar request from",file["src"],"to",file["dest"]
