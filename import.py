@@ -114,6 +114,27 @@ if "tar" in config:
         products.append({"filename": dest})
         tar.close()
 
+#untar .tar.gz to local directory
+#This is not necessary an import functionality, and maintly exists for scott's backup tool 
+if "untar" in config:
+    for file in config["untar"]:
+        print "Handling untar request from",file["src"],"to",file["dest"]
+        src = file["src"]
+        dest = file["dest"]
+
+        taropt = ""
+        if "opts" in file:
+            taropt = file["opts"]
+
+        #TODO - how should I handle existing directory?
+
+        #now create tar file
+        tar = tarfile.open(src, "r:"+taropt)
+        tar.extractall(dest)
+        products.append({"filename": dest})
+        tar.close()
+
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
+
 
