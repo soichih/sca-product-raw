@@ -6,17 +6,20 @@ import requests
 import time
 import errno
 import tarfile
+import sys
 
 block_sz = 8192*10
 
 with open('config.json') as config_json:
     config = json.load(config_json)
 
+opcount = 0 #number of requested operations
 products = []
 
 #download remote file via urllib2
 if "download" in config:
     for file in config["download"]:
+        opcount += 1
 
         dir=file["dir"]
         if not os.path.exists(dir):
@@ -76,6 +79,8 @@ if "download" in config:
 #symlink files from local directory to task directory
 if "symlink" in config:
     for file in config["symlink"]:
+        opcount += 1
+
         print "Handling symlink request",file["src"]
         src = file["src"]
 
@@ -105,6 +110,8 @@ if "symlink" in config:
 #create tar file from local directory 
 if "tar" in config:
     for file in config["tar"]:
+        opcount += 1
+
         src = file["src"]
         dest = file["dest"]
         print "Handling targz request from",src,"to",dest
@@ -138,7 +145,8 @@ if "tar" in config:
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
 if "untar" in config:
     for file in config["untar"]:
-        #print dir(file)
+        opcount += 1
+
         src = file["src"]
         dest = file["dest"]
         print "Handling untar request from",src,"to",dest
@@ -170,4 +178,10 @@ if "untar" in config:
 
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
+
+if opcount != len(products):
+    print >> sys.stderr, "Not all request successfully processed."
+    sys.exit(1) 
+
+print "All request completed successfully"
 
