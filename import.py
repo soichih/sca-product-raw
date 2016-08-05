@@ -100,6 +100,7 @@ if "symlink" in config:
         except Exception as e:
             print "failed to symlink:"+src
             print e 
+            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #create tar file from local directory 
 if "tar" in config:
@@ -110,22 +111,28 @@ if "tar" in config:
 
         progress_url = os.environ["SCA_PROGRESS_URL"]+".tar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
+        try:
 
-        #taropt can be "gz" or "bz2"..
-        taropt = ""
-        if "opts" in file:
-            taropt = file["opts"]
+            #taropt can be "gz" or "bz2"..
+            taropt = ""
+            if "opts" in file:
+                taropt = file["opts"]
 
-        #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
-        #now create tar file
-        tar = tarfile.open(dest, "w:"+taropt)
-        tar.add(src, arcname=os.path.basename(src))
+            #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
+            #now create tar file
+            tar = tarfile.open(dest, "w:"+taropt)
+            tar.add(src, arcname=os.path.basename(src))
 
-        #TODO monitor tar progress and report to progress service
+            #TODO monitor tar progress and report to progress service
 
-        requests.post(progress_url, json={"progress": 1, "status": "finished"});
-        products.append({"filename": dest})
-        tar.close()
+            requests.post(progress_url, json={"progress": 1, "status": "finished"});
+            products.append({"filename": dest})
+            tar.close()
+
+        except Exception as e:
+            print "failed to symlink:"+src
+            print e 
+            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #untar .tar.gz to local directory
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
@@ -138,24 +145,29 @@ if "untar" in config:
 
         progress_url = os.environ["SCA_PROGRESS_URL"]+".untar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
+        try:
 
-        taropt = ""
-        if "opts" in file:
-            taropt = file["opts"]
+            taropt = ""
+            if "opts" in file:
+                taropt = file["opts"]
 
-        #TODO - how should I handle existing directory?
-        #TODO - extractall is *probably* slow - guessing from tarfile..
-        #TODO - report progress report
+            #TODO - how should I handle existing directory?
+            #TODO - extractall is *probably* slow - guessing from tarfile..
+            #TODO - report progress report
 
-        #now create tar file
-        tar = tarfile.open(src, "r:"+taropt)
-        tar.extractall(dest)
+            #now create tar file
+            tar = tarfile.open(src, "r:"+taropt)
+            tar.extractall(dest)
 
-        requests.post(progress_url, json={"progress": 1, "status": "finished"});
-        products.append({"filename": dest})
-        tar.close()
+            requests.post(progress_url, json={"progress": 1, "status": "finished"});
+            products.append({"filename": dest})
+            tar.close()
+
+        except Exception as e:
+            print "failed to symlink:"+src
+            print e 
+            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
-
 
