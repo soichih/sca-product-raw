@@ -78,6 +78,9 @@ if "symlink" in config:
     for file in config["symlink"]:
         print "Handling symlink request",file["src"]
         src = file["src"]
+
+        progress_url = os.environ["SCA_PROGRESS_URL"]+".symlink"+str(len(products));
+        requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
         try:
             dest = src.split('/')[-1]
             if "dest" in file:
@@ -85,11 +88,13 @@ if "symlink" in config:
 
             try:
                 os.symlink(src, dest)
+                requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 products.append({"filename": dest})
             except OSError, e:
                 if e.errno == errno.EEXIST:
                     os.remove(dest)
                     os.symlink(src, dest)
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
                     products.append({"filename": dest})
 
         except Exception as e:
@@ -101,16 +106,24 @@ if "tar" in config:
     for file in config["tar"]:
         src = file["src"]
         dest = file["dest"]
-        print "Handling targz request from",file["src"],"to",file["dest"]
+        print "Handling targz request from",src,"to",dest
+
+        progress_url = os.environ["SCA_PROGRESS_URL"]+".tar"+str(len(products));
+        requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
 
         #taropt can be "gz" or "bz2"..
         taropt = ""
         if "opts" in file:
             taropt = file["opts"]
 
+        #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
         #now create tar file
         tar = tarfile.open(dest, "w:"+taropt)
         tar.add(src, arcname=os.path.basename(src))
+
+        #TODO monitor tar progress and report to progress service
+
+        requests.post(progress_url, json={"progress": 1, "status": "finished"});
         products.append({"filename": dest})
         tar.close()
 
@@ -118,20 +131,27 @@ if "tar" in config:
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
 if "untar" in config:
     for file in config["untar"]:
-        print dir(file)
+        #print dir(file)
         src = file["src"]
         dest = file["dest"]
-        print "Handling untar request from",file["src"],"to",file["dest"]
+        print "Handling untar request from",src,"to",dest
+
+        progress_url = os.environ["SCA_PROGRESS_URL"]+".untar"+str(len(products));
+        requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
 
         taropt = ""
         if "opts" in file:
             taropt = file["opts"]
 
         #TODO - how should I handle existing directory?
+        #TODO - extractall is *probably* slow - guessing from tarfile..
+        #TODO - report progress report
 
         #now create tar file
         tar = tarfile.open(src, "r:"+taropt)
         tar.extractall(dest)
+
+        requests.post(progress_url, json={"progress": 1, "status": "finished"});
         products.append({"filename": dest})
         tar.close()
 
