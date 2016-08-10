@@ -21,7 +21,7 @@
         {{file.filename}}
     </div>
     <div 
-        uib-tooltip="{{file.longname}}" tooltip-popup-delay="300"
+        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
         ng-if="file.attrs.mode_string[0] == '-'"
         style="padding-left: {{$ctrl.indent}}em"
         class="sca-product-raw-file">
