@@ -13,9 +13,9 @@ import sys
 
 block_sz = 8192*10
 
-print tarfile.ENCODING
-tarfile.ENCODING="en_US.UTF-8"
-print tarfile.ENCODING
+#need to set it to UTF_8 to prevent
+#'ascii' codec can't decode byte 0xc3 in position 1: ordinal not in range(128)
+tarfile.ENCODING="UTF-8"
 
 with open('config.json') as config_json:
     config = json.load(config_json)
