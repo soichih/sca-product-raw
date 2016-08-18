@@ -8,14 +8,13 @@ import errno
 import tarfile
 import sys
 
-#didn't cure the problem..
-#os.environ["LANG"] = "en_US.UTF-8"
-
 block_sz = 8192*10
 
+#didn't cure the problem..
+#os.environ["LANG"] = "en_US.UTF-8"
 #need to set it to UTF_8 to prevent
 #'ascii' codec can't decode byte 0xc3 in position 1: ordinal not in range(128)
-tarfile.ENCODING="UTF-8"
+#tarfile.ENCODING="UTF-8"
 
 with open('config.json') as config_json:
     config = json.load(config_json)
