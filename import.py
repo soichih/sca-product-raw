@@ -8,6 +8,11 @@ import errno
 import tarfile
 import sys
 
+#to prevent 
+#> 'ascii' codec can't decode byte 0xc3 in position 1: ordinal not in range(128)
+#for tar
+os.environ["LANG"] = "en_US.UTF-8"
+
 block_sz = 8192*10
 
 with open('config.json') as config_json:
@@ -114,7 +119,7 @@ if "tar" in config:
 
         src = file["src"]
         dest = file["dest"]
-        print "Handling targz request from",src,"to",dest
+        print "Handling tar request from",src,"to",dest
 
         progress_url = os.environ["SCA_PROGRESS_URL"]+".tar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
@@ -137,7 +142,7 @@ if "tar" in config:
             tar.close()
 
         except Exception as e:
-            print "failed to symlink:"+src
+            print "failed to tar:"+src
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
@@ -172,7 +177,7 @@ if "untar" in config:
             tar.close()
 
         except Exception as e:
-            print "failed to symlink:"+src
+            print "failed to untar:"+src
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
