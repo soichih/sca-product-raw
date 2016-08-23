@@ -97,10 +97,12 @@ if "symlink" in config:
             if "dest" in file:
                 dest = file["dest"]
 
-            #take care of directory..
+            #make sure dest dir exists
             dirname = os.path.dirname(dest)
-            print "making sure dir:",dirname,"exists"
-            os.makedirs(dirname)            
+            if len(dirname) > 0:
+                if not os.path.isdir(dirname):
+                    print "making sure dir:",dirname,"exists"
+                    os.makedirs(dirname)            
 
             try:
                 os.symlink(src, dest)
