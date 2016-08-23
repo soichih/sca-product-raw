@@ -7,6 +7,7 @@ import time
 import errno
 import tarfile
 import sys
+import shutil
 
 block_sz = 8192*10
 
@@ -117,6 +118,36 @@ if "symlink" in config:
 
         except Exception as e:
             print "failed to symlink:"+src
+            print e 
+            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+
+if "copy" in config:
+    for file in config["copy"]:
+        opcount += 1
+
+        print "Handling copy request",file["src"]
+        src = file["src"]
+
+        progress_url = os.environ["SCA_PROGRESS_URL"]+".copy"+str(len(products));
+        requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+        try:
+            dest = src.split('/')[-1]
+            if "dest" in file:
+                dest = file["dest"]
+
+            #make sure dest dir exists
+            dirname = os.path.dirname(dest)
+            if len(dirname) > 0:
+                if not os.path.isdir(dirname):
+                    print "making sure dir:",dirname,"exists"
+                    os.makedirs(dirname)            
+
+            shutil.copyfile(src, dest)
+            requests.post(progress_url, json={"progress": 1, "status": "finished"});
+            products.append({"filename": dest})
+
+        except Exception as e:
+            print "failed to copy:"+src
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
