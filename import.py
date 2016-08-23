@@ -82,7 +82,7 @@ if "download" in config:
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
-#symlink files from local directory to task directory
+#symlink files from local directory to task directory (dest is optional)
 if "symlink" in config:
     for file in config["symlink"]:
         opcount += 1
@@ -96,6 +96,11 @@ if "symlink" in config:
             dest = src.split('/')[-1]
             if "dest" in file:
                 dest = file["dest"]
+
+            #take care of directory..
+            dirname = os.path.dirname(dest)
+            print "making sure dir:",dirname,"exists"
+            os.makedirs(dirname)            
 
             try:
                 os.symlink(src, dest)
