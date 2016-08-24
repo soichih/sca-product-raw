@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 import os
 import json
 import urllib2
@@ -83,7 +83,10 @@ if "download" in config:
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
+#(experimental)
 #symlink files from local directory to task directory (dest is optional)
+#TODO - due to the way symlink works, unlike copy, src needs to be relative to dest.. I need to 
+#somehow make the src relative to the dest path (not taskdir)
 if "symlink" in config:
     for file in config["symlink"]:
         opcount += 1
