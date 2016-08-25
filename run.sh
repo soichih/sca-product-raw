@@ -5,5 +5,11 @@
 #I tried setting environ["LANG"] and tarfile.ENCODING inside import.py, but that didn't fix it
 export LANG="en_US.UTF-8"
 
+#do bigred2 specific things
+echo $HOME | grep -i bigred > /dev/null
+if [ $? -eq 0 ]; then
+    module load python
+fi
+
 $SCA_SERVICE_DIR/import.py
 
