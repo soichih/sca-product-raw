@@ -11,5 +11,10 @@ if [ $? -eq 0 ]; then
     module load python
 fi
 
-$SCA_SERVICE_DIR/import.py
+rm -f finished
+echo "starting import.py"
+(
+nohup time node $SCA_SERVICE_DIR/import.py > stdout.log 2> stderr.log 
+echo $? > finished 
+) &
 
