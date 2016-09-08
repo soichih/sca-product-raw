@@ -9,8 +9,9 @@
     class="text-muted"><i class="fa fa-cog fa-spin"></i> Loading</div>
 
 <div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-item">
+    <!--directory-->
     <div 
-        ng-if="file.attrs.mode_string[0] != '-'"
+        ng-if="file.attrs.mode_string[0] == 'd'"
         ng-click="file.open = !file.open"
         style="padding-left: {{$ctrl.indent}}em"
         class="sca-product-raw-folder">
@@ -20,15 +21,28 @@
         </span>
         {{file.filename}}
     </div>
+
+    <!--files/links-->
     <div 
-        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
         ng-if="file.attrs.mode_string[0] == '-'"
+        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
         style="padding-left: {{$ctrl.indent}}em"
         class="sca-product-raw-file">
         <a class="sca-product-raw-file" target="_blank" href="{{file.url}}">
             <i class="fa fa-file-o text-muted"></i>
             {{file.filename}}
         </a>
+    </div>
+
+    <div 
+        ng-if="file.attrs.mode_string[0] == 'l'"
+        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
+        style="padding-left: {{$ctrl.indent}}em"
+        class="sca-product-raw-file">
+        <span class="text-muted" ng-click="link(file)">
+            <i class="fa fa-link text-muted"></i>
+            {{file.filename}}
+        </span>
     </div>
 
     <!--
@@ -50,4 +64,3 @@
     -->
 </div>
 <sca-product-raw-dir ng-repeat-end indent="$ctrl.indent+1" taskid="$ctrl.taskid" path="file.path" ng-if="file.open"></sca-product-raw-dir>
-

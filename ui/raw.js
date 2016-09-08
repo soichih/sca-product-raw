@@ -5,6 +5,8 @@
     var service = angular.module('sca-product-raw', [ ]);
     service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 'scaTask', 'appconf',
     function(toaster, $http, $timeout, scaTask, appconf) {
+
+
         return {
             restrict: 'E',
             scope: {
@@ -13,6 +15,31 @@
             }, 
             templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
+        
+                //need to load task so that I can load resource
+                var t = scaTask.get($scope.taskid);
+                t._promise.then(function() {
+                    $scope.task = t;
+                  
+                    //load resource detail
+                    console.log("loading resource detail:"+t.resource_id);
+                    $http.get(appconf.wf_api+"/resource/", {
+                        params: {
+                            find: JSON.stringify({ _id: t.resource_id })
+                        }
+                    }).then(function(res) {
+                        if(res.data.resources && res.data.resources.length == 1) {
+                            $scope.resource_detail = res.data.resources[0];
+                            //console.dir($scope.resource_detail);
+                        } else {
+                            console.error("couldn't load resource detail");
+                        }
+                    }, function(res) {
+                        if(res.data && res.data.message) toaster.error(res.data.message);
+                        else toaster.error(res.statusText);
+                    });
+                });
+
             }
         };
     }]);
@@ -44,7 +71,7 @@
 
                 $ctrl.loading = true;
                 console.log("loading from resource:"+t.resource_id+" path:"+$ctrl.taskdir+"/"+$ctrl.path);
-                $http.get(appconf.sca_api+"/resource/ls/"+t.resource_id, {
+                $http.get(appconf.wf_api+"/resource/ls/"+t.resource_id, {
                     //timeout: 3000, //server side should handle this (with good explanation)
                     params: { path: $ctrl.taskdir+"/"+$ctrl.path }
                 })
@@ -53,7 +80,7 @@
                     $ctrl.files = res.data.files;
                     $ctrl.files.forEach(function(file) {
                         file.path = $ctrl.path+"/"+file.filename;
-                        file.url = appconf.sca_api+"/resource/download?r="+t.resource_id+"&p="+encodeURIComponent($ctrl.taskdir+"/"+file.path)+"&at="+jwt;
+                        file.url = appconf.wf_api+"/resource/download?r="+t.resource_id+"&p="+encodeURIComponent($ctrl.taskdir+"/"+file.path)+"&at="+jwt;
                     });
                     console.dir($ctrl.files);
                 }, function(res) {
@@ -61,7 +88,8 @@
                     if(res.data && res.data.message) toaster.error(res.data.message);
                     else toaster.error(res.statusText);
                 });
-            });
+
+             });
 
             /*
             //TODO - it this called for component?
@@ -69,6 +97,11 @@
                 if(file_timeout) $timeout.cancel(file_timeout);
             });
             */
+
+            $scope.link = function(file) {
+                console.dir(file);
+                alert("Traversing symbolic link is currently disabled");
+            }
         }
     });
 

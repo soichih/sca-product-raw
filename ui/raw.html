@@ -18,7 +18,9 @@ padding: 10px;
 border-radius: 5px;
 }
 </style>
-<!--<p class="text-muted" ng-if="!t.resource_id"><i class="fa fa-hourglass-start"></i> {{t.status_msg}}</p>-->
 <p class="text-muted" ng-if="$ctrl.loading"><i class="fa fa-cog fa-spin"></i> Loading files...</p>
-<sca-product-raw-dir indent="0 "taskid="taskid" path="path"></sca-product-raw-dir>
-
+<sca-product-raw-dir indent="0" taskid="taskid" path="path"></sca-product-raw-dir>
+<small class="text-muted ng-binding">
+    <hr style="margin-top: 10px; margin-bottom: 5px;">
+    <i class="fa fa-server" aria-hidden="true"></i> {{resource_detail.name}}:{{task._envs.SCA_TASK_DIR}}
+</small>
