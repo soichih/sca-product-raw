@@ -13,7 +13,7 @@
                 taskid: '=',
                 path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             }, 
-            templateUrl: 'bower_components/sca-product-raw/ui/raw.html',
+            templateUrl: 'node_modules/sca-product-raw/ui/raw.html',
             link: function($scope, element) {
         
                 //need to load task so that I can load resource
@@ -51,7 +51,7 @@
             indent: '=',
             path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
         },
-        templateUrl: 'bower_components/sca-product-raw/ui/dir.html',
+        templateUrl: 'node_modules/sca-product-raw/ui/dir.html',
         controller: function($scope, appconf, $http, toaster, scaTask) {
             var $ctrl = this;
             var jwt = localStorage.getItem(appconf.jwt_id);

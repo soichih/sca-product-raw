@@ -28,6 +28,7 @@ if "download" in config:
     for file in config["download"]:
         opcount += 1
 
+        #TODO - should I default it to "."?
         dir=file["dir"]
         if not os.path.exists(dir):
             os.makedirs(dir)

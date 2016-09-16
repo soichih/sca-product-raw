@@ -1,6 +1,6 @@
 {
   "name": "sca-product-raw",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "raw data product UI and importer (download, cp, etc..)",
   "main": "index.js",
   "scripts": {
