@@ -41,3 +41,9 @@ Sample products.json
 ]
 ```
 
+## UI
+
+/ui provides angular directive to easily show content of the taskdir using SCA API. Apart from the usual SCA configuration,
+you will need following angular dependencies 
+
+> https://github.com/yaru22/angular-timeago
