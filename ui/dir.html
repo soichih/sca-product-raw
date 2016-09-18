@@ -1,66 +1,57 @@
-<!--no child files-->
-
 <div ng-if="$ctrl.files.length == 0" 
     style="padding-left: {{$ctrl.indent}}em"
-    class="text-muted slide-down">Empty</div>
+    class="slide-down sca-product-raw-file">
+    <span class="text-muted">(empty)</span>
+</div>
 
+<!-- it's usually very quick, so there is not much point
 <div ng-if="$ctrl.loading"
     style="padding-left: {{$ctrl.indent}}em"
-    class="text-muted"><i class="fa fa-cog fa-spin"></i> Loading</div>
+    class="text-muted sca-product-raw-name">
+    <i class="fa fa-cog fa-spin"></i> Loading ...
+</div>
+-->
 
-<div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-item">
-    <!--directory-->
-    <div 
-        ng-if="file.attrs.mode_string[0] == 'd'"
-        ng-click="file.open = !file.open"
-        style="padding-left: {{$ctrl.indent}}em"
-        class="sca-product-raw-folder">
-        <span style="color: #008cba">
+<div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-file" ng-click="click(file)">
+
+    <!--modified date-->
+    <span class="sca-product-raw-item sca-product-raw-size">{{file.attrs.mtime*1000|date}}</span>
+
+    <!--filesize-->
+    <span class="sca-product-raw-item sca-product-raw-modified text-muted" style="text-align: right;">
+        {{file.attrs.size|bytes}}
+    </span>
+
+    <span class="sca-product-raw-item sca-product-raw-ctrl text-muted"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
+
+    <span 
+        style="padding-left: {{$ctrl.indent}}em;"
+        class="sca-product-raw-item sca-product-raw-name">
+
+        <!--directory icon -->
+        <span ng-if="file.attrs.mode_string[0] == 'd'" style="color: #008cba">
             <i class="fa fa-folder" ng-if="!file.open"></i>
             <i class="fa fa-folder-open" ng-if="file.open"></i>
         </span>
-        {{file.filename}}
-    </div>
 
-    <!--files/links-->
-    <div 
-        ng-if="file.attrs.mode_string[0] == '-'"
-        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
-        style="padding-left: {{$ctrl.indent}}em"
-        class="sca-product-raw-file">
-        <a class="sca-product-raw-file" target="_blank" href="{{file.url}}">
+        <!--file icon-->
+        <span ng-if="file.attrs.mode_string[0] == '-'">
             <i class="fa fa-file-o text-muted"></i>
-            {{file.filename}}
-        </a>
-    </div>
+        </span>
 
-    <div 
-        ng-if="file.attrs.mode_string[0] == 'l'"
-        uib-tooltip="{{file._raw}}" tooltip-popup-delay="300"
-        style="padding-left: {{$ctrl.indent}}em"
-        class="sca-product-raw-file">
-        <span class="text-muted" ng-click="link(file)">
+        <!--links-->
+        <span ng-if="file.attrs.mode_string[0] == 'l'">
             <i class="fa fa-link text-muted"></i>
-            {{file.filename}}
         </span>
-    </div>
-
-    <!--
-    <time class="pull-right" style="width: 120px">
-        {{file.attrs.mtime*1000|date:'short'}}
-    </time>
-    -->
-    <!--
-    <div class="pull-right">
-        <pre style="font-size: 90%; border: none; background-color: inherit; margin: 0px;padding: 0px;">{{file.attrs.mode_string}}</pre>
-    </div>
-    -->
-    <!--
-    <div class="pull-right" style="text-align: right; width: 120px" ng-if="file.attrs.mode_string[0] == '-'">
-        <span ng-if="file.attrs.mode_string[0] != 'd'">
-            {{file.attrs.size|bytes}}
-        </span>
-    </div>
-    -->
+        &nbsp;
+        {{file.filename}}
+    </span>
+    <br clear="both">
 </div>
-<sca-product-raw-dir ng-repeat-end indent="$ctrl.indent+1" taskid="$ctrl.taskid" path="file.path" ng-if="file.open"></sca-product-raw-dir>
+
+<sca-product-raw-dir ng-repeat-end
+    indent="$ctrl.indent+1" 
+    taskid="$ctrl.taskid" path="file.path" 
+    ng-if="file.open">
+</sca-product-raw-dir>
+

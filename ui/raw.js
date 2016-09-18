@@ -3,46 +3,50 @@
 
     //https://github.com/danialfarid/ng-file-upload
     var service = angular.module('sca-product-raw', [ ]);
-    service.directive('scaProductRaw', ['toaster', '$http', '$timeout', 'scaTask', 'appconf',
-    function(toaster, $http, $timeout, scaTask, appconf) {
-
-
+    service.directive('scaProductRaw', function(toaster, $http, $timeout, scaTask, appconf) {
         return {
             restrict: 'E',
             scope: {
-                taskid: '=',
+                taskid: '<',
                 path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             }, 
             templateUrl: 'node_modules/sca-product-raw/ui/raw.html',
-            link: function($scope, element) {
-        
-                //need to load task so that I can load resource
-                var t = scaTask.get($scope.taskid);
-                t._promise.then(function() {
-                    $scope.task = t;
-                  
+            controller: function($scope) {
+                function load_resource(resource_id) {
+                    if(!resource_id) return;
                     //load resource detail
-                    console.log("loading resource detail:"+t.resource_id);
+                    console.log("loading resource detail:"+resource_id);
                     $http.get(appconf.wf_api+"/resource/", {
                         params: {
-                            find: JSON.stringify({ _id: t.resource_id })
+                            find: JSON.stringify({ _id: resource_id })
                         }
                     }).then(function(res) {
                         if(res.data.resources && res.data.resources.length == 1) {
+                            //console.log("loaded resource details");
+                            //console.dir(res.data.resources);
                             $scope.resource_detail = res.data.resources[0];
-                            //console.dir($scope.resource_detail);
                         } else {
-                            console.error("couldn't load resource detail");
+                            console.error("couldn't load resource detail: ");
                         }
                     }, function(res) {
                         if(res.data && res.data.message) toaster.error(res.data.message);
                         else toaster.error(res.statusText);
                     });
+                }
+                
+                //need to load task so that I can load resource
+                var t = scaTask.get($scope.taskid);
+                t._promise.then(function() {
+                    $scope.task = t;
+                    $scope.$watch('task.resource_id', function() {          
+                        //console.log("task.resource_id updated:"+t.resource_id);
+                        load_resource(t.resource_id);
+                    });
                 });
 
             }
         };
-    }]);
+    });
 
     service.component('scaProductRawDir', {
         //transclude: true,
@@ -53,6 +57,7 @@
         },
         templateUrl: 'node_modules/sca-product-raw/ui/dir.html',
         controller: function($scope, appconf, $http, toaster, scaTask) {
+            console.log("loading directory");
             var $ctrl = this;
             var jwt = localStorage.getItem(appconf.jwt_id);
             this.indent_child = this.indent+1;
@@ -89,18 +94,25 @@
                     else toaster.error(res.statusText);
                 });
 
-             });
+            });
 
             /*
-            //TODO - it this called for component?
-            $scope.$on("$destroy", function(event) {
-                if(file_timeout) $timeout.cancel(file_timeout);
-            });
-            */
-
             $scope.link = function(file) {
                 console.dir(file);
                 alert("Traversing symbolic link is currently disabled");
+            }
+            */
+            $scope.click = function(file) {
+                switch(file.attrs.mode_string[0]) {
+                case "d":
+                    file.open = !file.open; break;
+                case "l":
+                    alert("Traversing symbolic link is currently disabled");
+                    break;
+                case "-":
+                    window.location = file.url;
+                }
+                console.dir(file);
             }
         }
     });
