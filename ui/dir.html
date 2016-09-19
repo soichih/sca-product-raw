@@ -1,5 +1,5 @@
 <div ng-if="$ctrl.files.length == 0" 
-    style="padding-left: {{$ctrl.indent}}em"
+    style="padding-left: {{$ctrl.indent}}em; height: 27px"
     class="slide-down sca-product-raw-file">
     <span class="text-muted">(empty)</span>
 </div>
@@ -15,10 +15,10 @@
 <div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-file" ng-click="click(file)">
 
     <!--modified date-->
-    <span class="sca-product-raw-item sca-product-raw-size">{{file.attrs.mtime*1000|timeAgo}}</span>
+    <span class="sca-product-raw-item sca-product-raw-modified">{{file.attrs.mtime*1000|timeAgo}}</span>
 
     <!--filesize-->
-    <span class="sca-product-raw-item sca-product-raw-modified text-muted" style="text-align: right;">
+    <span class="sca-product-raw-item sca-product-raw-size text-muted" style="text-align: right;">
         {{file.attrs.size|bytes}}
     </span>
 

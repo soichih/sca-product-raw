@@ -43,7 +43,6 @@
                         load_resource(t.resource_id);
                     });
                 });
-
             }
         };
     });
@@ -75,7 +74,7 @@
                 }
 
                 $ctrl.loading = true;
-                console.log("loading from resource:"+t.resource_id+" path:"+$ctrl.taskdir+"/"+$ctrl.path);
+                console.log("ls resource:"+t.resource_id+" path:"+$ctrl.taskdir+"/"+$ctrl.path);
                 $http.get(appconf.wf_api+"/resource/ls/"+t.resource_id, {
                     //timeout: 3000, //server side should handle this (with good explanation)
                     params: { path: $ctrl.taskdir+"/"+$ctrl.path }
@@ -90,8 +89,12 @@
                     console.dir($ctrl.files);
                 }, function(res) {
                     $ctrl.loading = false;
-                    if(res.data && res.data.message) toaster.error(res.data.message);
-                    else toaster.error(res.statusText);
+
+                    //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
+                    console.log("ls failed");
+                    console.dir(res);
+                    //if(res.data && res.data.message) toaster.error(res.data.message);
+                    //else toaster.error(res.statusText);
                 });
 
             });
