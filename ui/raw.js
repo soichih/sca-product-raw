@@ -86,13 +86,14 @@
                         file.path = $ctrl.path+"/"+file.filename;
                         file.url = appconf.wf_api+"/resource/download?r="+t.resource_id+"&p="+encodeURIComponent($ctrl.taskdir+"/"+file.path)+"&at="+jwt;
                     });
+                    $ctrl.error = null;
                     console.dir($ctrl.files);
                 }, function(res) {
                     $ctrl.loading = false;
-
                     //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
                     console.log("ls failed");
                     console.dir(res);
+                    if(res.data && res.data.message) $ctrl.error = res.data.message;
                     //if(res.data && res.data.message) toaster.error(res.data.message);
                     //else toaster.error(res.statusText);
                 });
@@ -132,6 +133,7 @@
         };
     }]);
 
+    /* should come from sca-ng-wf
     service.filter('bytes', function() {
         return function(bytes, precision) {
             if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '-';
@@ -141,6 +143,7 @@
             return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
         }
     });
+    */
 
     service.filter('encodeURI', function() {
       return window.encodeURIComponent;
