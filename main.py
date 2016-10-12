@@ -5,9 +5,10 @@ import urllib2
 import requests
 import time
 import errno
-import tarfile
+#import tarfile
 import sys
 import shutil
+import subprocess
 
 block_sz = 8192*10
 
@@ -155,6 +156,15 @@ if "copy" in config:
             print e 
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
+
+def append_opt(taropt, cmd):
+    if taropt == "gz":
+        cmd.append("--gzip")
+    if taropt == "bz2":
+        cmd.append("--bzip2")
+    if taropt  == "xz":
+        cmd.append("--xz")
+
 #create tar file from local directory 
 if "tar" in config:
     for file in config["tar"]:
@@ -169,21 +179,24 @@ if "tar" in config:
         try:
 
             #taropt can be "gz" or "bz2"..
-            taropt = ""
+            cmd = ["tar", "-c"]
             if "opts" in file:
-                taropt = file["opts"]
+                append_opt(file["opts"], cmd)
+
+            cmd.append("--directory="+os.path.dirname(src))
+            cmd.append("--file="+dest)
+            cmd.append(os.path.basename(src))
+            print cmd
 
             #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
             #now create tar file
-            tar = tarfile.open(dest, "w:"+taropt)
-            tar.add(src, arcname=os.path.basename(src))
-
-            #TODO monitor tar progress and report to progress service
-
-            requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            products.append({"filename": dest})
-            tar.close()
-
+            retcode = subprocess.call(cmd)
+            if retcode == 0: 
+                requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                products.append({"filename": dest})
+            else:
+                requests.post(progress_url, json={"status": "failed"});
+                 
         except Exception as e:
             print "failed to tar:"+src
             print e 
@@ -203,21 +216,22 @@ if "untar" in config:
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
 
-            taropt = ""
+            cmd = ["tar", "-x"]
             if "opts" in file:
-                taropt = file["opts"]
+                append_opt(file["opts"], cmd)
 
-            #TODO - how should I handle existing directory?
-            #TODO - extractall is *probably* slow - guessing from tarfile..
-            #TODO - report progress report
+            cmd.append("--directory="+dest)
+            cmd.append("--file="+src)
 
-            #now create tar file
-            tar = tarfile.open(src, "r:"+taropt)
-            tar.extractall(dest)
-
-            requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            products.append({"filename": dest})
-            tar.close()
+            print cmd
+            retcode = subprocess.call(cmd)
+            if retcode == 0: 
+                requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                #TODO - dest only points to where we are unarchiving. 
+                #I should add the base directory name inside the ardhive?
+                products.append({"filename": dest})
+            else:
+                requests.post(progress_url, json={"status": "failed"});
 
         except Exception as e:
             print "failed to untar:"+src
