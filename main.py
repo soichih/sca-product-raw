@@ -212,6 +212,11 @@ if "untar" in config:
         dest = file["dest"]
         print "Handling untar request from",src,"to",dest
 
+        #make sure dest dir exists
+        if not os.path.isdir(dest):
+            print "creating dest dir:",dest
+            os.makedirs(dest)            
+
         progress_url = os.environ["SCA_PROGRESS_URL"]+".untar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
