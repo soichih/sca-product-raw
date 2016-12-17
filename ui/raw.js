@@ -7,7 +7,7 @@
         return {
             restrict: 'E',
             scope: {
-                taskid: '<',
+                taskid: '=',
                 path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             }, 
             templateUrl: 'node_modules/sca-product-raw/ui/raw.html',
@@ -47,78 +47,81 @@
         };
     });
 
-    service.component('scaProductRawDir', {
-        //transclude: true,
-        bindings: {
-            taskid: '=',
-            indent: '=',
-            path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
-        },
-        templateUrl: 'node_modules/sca-product-raw/ui/dir.html',
-        controller: function($scope, appconf, $http, toaster, scaTask) {
-            console.log("loading directory");
-            var $ctrl = this;
-            var jwt = localStorage.getItem(appconf.jwt_id);
-            this.indent_child = this.indent+1;
-            if(!this.path) this.path = "";
+    service.directive('scaProductRawDir', function(appconf, $http, toaster, scaTask) {
+        return {
+            restrict: 'E',
+            scope: {
+                taskid: '=',
+                indent: '=',
+                path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
+            },
+            templateUrl: 'node_modules/sca-product-raw/ui/dir.html',
+            controller: function($scope) {
+                console.log("loading directory taskid:"+$scope.taskid);
+                $scope.indent_child = $scope.indent+1;
+                if(!$scope.path) $scope.path = "";
 
-            this.getNumber = function(num) { return new Array(num); };
+                this.getNumber = function(num) { return new Array(num); };
 
-            //start by loading task
-            var t = scaTask.get(this.taskid);
-            t._promise.then(function() {
-                $ctrl.taskdir = t.instance_id+"/"+t._id;
-                if(!t.resource_id) {
-                    console.error("sca-product-raw initialized on task with no resource_id");
-                    return;
-                }
+                //start by loading task
+                var task = scaTask.get($scope.taskid);
+                task._promise.then(function() {
+                    //console.log("scaTask.get returned task");
+                    //console.log(JSON.stringify(task));
+                    $scope.taskdir = task.instance_id+"/"+task._id;
+                    if(!task.resource_id) {
+                        console.error("sca-product-raw initialized on task with no resource_id");
+                        return;
+                    }
 
-                $ctrl.loading = true;
-                console.log("ls resource:"+t.resource_id+" path:"+$ctrl.taskdir+"/"+$ctrl.path);
-                $http.get(appconf.wf_api+"/resource/ls/"+t.resource_id, {
-                    //timeout: 3000, //server side should handle this (with good explanation)
-                    params: { path: $ctrl.taskdir+"/"+$ctrl.path }
-                })
-                .then(function(res) {
-                    $ctrl.loading = false;
-                    $ctrl.files = res.data.files;
-                    $ctrl.files.forEach(function(file) {
-                        file.path = $ctrl.path+"/"+file.filename;
-                        file.url = appconf.wf_api+"/resource/download?r="+t.resource_id+"&p="+encodeURIComponent($ctrl.taskdir+"/"+file.path)+"&at="+jwt;
+                    $scope.loading = true;
+                    //console.log("ls resource:"+task.resource_id+" path:"+$scope.taskdir+"/"+$scope.path);
+                    $http.get(appconf.wf_api+"/resource/ls/"+task.resource_id, {
+                        params: { path: $scope.taskdir+"/"+$scope.path }
+                    })
+                    .then(function(res) {
+                        $scope.loading = false;
+                        $scope.files = res.data.files;
+                        var jwt = localStorage.getItem(appconf.jwt_id);
+                        $scope.files.forEach(function(file) {
+                            file.path = $scope.path+"/"+file.filename;
+                            file.url = appconf.wf_api+"/resource/download?r="+task.resource_id+
+                                "&p="+encodeURIComponent($scope.taskdir+"/"+file.path)+
+                                "&at="+jwt;
+                        });
+                        $scope.error = null;
+                        //console.dir($scope.files);
+                    }, function(res) {
+                        $scope.loading = false;
+                        //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
+                        //console.log("ls failed");
+                        //console.dir(res);
+                        if(res.data && res.data.message) $scope.error = res.data.message;
+                        //if(res.data && res.data.message) toaster.error(res.data.message);
+                        //else toaster.error(res.statusText);
                     });
-                    $ctrl.error = null;
-                    console.dir($ctrl.files);
-                }, function(res) {
-                    $ctrl.loading = false;
-                    //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
-                    console.log("ls failed");
-                    console.dir(res);
-                    if(res.data && res.data.message) $ctrl.error = res.data.message;
-                    //if(res.data && res.data.message) toaster.error(res.data.message);
-                    //else toaster.error(res.statusText);
                 });
 
-            });
-
-            /*
-            $scope.link = function(file) {
-                console.dir(file);
-                alert("Traversing symbolic link is currently disabled");
-            }
-            */
-            $scope.click = function(file) {
-                switch(file.attrs.mode_string[0]) {
-                case "d":
-                    file.open = !file.open; break;
-                case "l":
+                /*
+                $scope.link = function(file) {
+                    console.dir(file);
                     alert("Traversing symbolic link is currently disabled");
-                    break;
-                case "-":
-                    window.location = file.url;
                 }
-                console.dir(file);
+                */
+                $scope.click = function(file) {
+                    switch(file.attrs.mode_string[0]) {
+                    case "d":
+                        file.open = !file.open; break;
+                    case "l":
+                        alert("Traversing symbolic link is currently disabled");
+                        break;
+                    case "-":
+                        window.location = file.url;
+                    }
+                    //console.dir(file);
+                }
             }
-        }
+        };
     });
 
     //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..

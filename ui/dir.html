@@ -1,19 +1,10 @@
-<p ng-if="$ctrl.error" class="alert alert-warning" style="margin-bottom: 0px;">{{$ctrl.error}}</p>
-<div ng-if="$ctrl.files.length == 0" 
-    style="padding-left: {{$ctrl.indent}}em; height: 27px"
+<p ng-if="error" class="alert alert-warning" style="margin-bottom: 0px;">{{error}}</p>
+<div ng-if="files.length == 0" 
+    style="padding-left: {{indent}}em; height: 27px"
     class="slide-down sca-product-raw-file">
     <span class="text-muted">(empty)</span>
 </div>
-
-<!-- it's usually very quick, so there is not much point
-<div ng-if="$ctrl.loading"
-    style="padding-left: {{$ctrl.indent}}em"
-    class="text-muted sca-product-raw-name">
-    <i class="fa fa-cog fa-spin"></i> Loading ...
-</div>
--->
-
-<div ng-repeat-start="file in $ctrl.files" class="slide-down sca-product-raw-file" ng-click="click(file)">
+<div ng-repeat-start="file in files" class="slide-down sca-product-raw-file" ng-click="click(file)">
 
     <!--modified date-->
     <span class="sca-product-raw-item sca-product-raw-modified" title="{{file.attrs.mtime*1000|date:'medium'}}">{{file.attrs.mtime*1000|timeAgo}}</span>
@@ -26,7 +17,7 @@
     <span class="sca-product-raw-item sca-product-raw-ctrl text-muted"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
 
     <span 
-        style="padding-left: {{$ctrl.indent}}em;"
+        style="padding-left: {{indent}}em;"
         class="sca-product-raw-item sca-product-raw-name">
 
         <!--directory icon -->
@@ -49,10 +40,5 @@
     </span>
     <br clear="both">
 </div>
-
-<sca-product-raw-dir ng-repeat-end
-    indent="$ctrl.indent+1" 
-    taskid="$ctrl.taskid" path="file.path" 
-    ng-if="file.open">
-</sca-product-raw-dir>
-
+<sca-product-raw-dir ng-repeat-end 
+    indent="indent+1" taskid="taskid" path="file.path" ng-if="file.open"></sca-product-raw-dir>
