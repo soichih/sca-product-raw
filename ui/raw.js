@@ -102,12 +102,6 @@
                     });
                 });
 
-                /*
-                $scope.link = function(file) {
-                    console.dir(file);
-                    alert("Traversing symbolic link is currently disabled");
-                }
-                */
                 $scope.click = function(file) {
                     switch(file.attrs.mode_string[0]) {
                     case "d":
@@ -118,7 +112,6 @@
                     case "-":
                         window.location = file.url;
                     }
-                    //console.dir(file);
                 }
             }
         };
