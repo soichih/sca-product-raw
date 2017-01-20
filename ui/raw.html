@@ -2,9 +2,8 @@
 sca-product-raw .sca-product-raw-file {
 border-bottom: 1px solid #f0f0f0;
 }
-sca-product-raw .sca-product-raw-file:hover[ng-click] {
+sca-product-raw .sca-product-raw-file:hover {
 background-color: #ddd;
-cursor: pointer;
 }
 sca-product-raw {
 font-size: 95%;
@@ -30,8 +29,16 @@ sca-product-raw .sca-product-raw-ctrl {
 float: right;
 width: 50px;
 }
+sca-product-raw .sca-product-raw-ctrl:hover {
+color: #008cba;
+cursor: pointer;
+}
 sca-product-raw .sca-product-raw-name {
 float: left;
+}
+sca-product-raw .sca-product-raw-name[ng-click]:hover {
+color: #008cba;
+cursor: pointer;
 }
 sca-product-raw .sca-product-raw-headers {
 border-bottom: 1px solid #ddd;

@@ -66,8 +66,6 @@
                 //start by loading task
                 var task = scaTask.get($scope.taskid);
                 task._promise.then(function() {
-                    //console.log("scaTask.get returned task");
-                    //console.log(JSON.stringify(task));
                     $scope.taskdir = task.instance_id+"/"+task._id;
                     if(!task.resource_id) {
                         console.error("sca-product-raw initialized on task with no resource_id");
@@ -86,21 +84,21 @@
                         $scope.files.forEach(function(file) {
                             file.path = $scope.path+"/"+file.filename;
                             file.url = appconf.wf_api+"/resource/download?r="+task.resource_id+
-                                "&p="+encodeURIComponent($scope.taskdir+"/"+file.path)+
+                                "&p="+encodeURIComponent($scope.taskdir+file.path)+
                                 "&at="+jwt;
                         });
                         $scope.error = null;
-                        //console.dir($scope.files);
                     }, function(res) {
                         $scope.loading = false;
                         //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
-                        //console.log("ls failed");
-                        //console.dir(res);
                         if(res.data && res.data.message) $scope.error = res.data.message;
-                        //if(res.data && res.data.message) toaster.error(res.data.message);
-                        //else toaster.error(res.statusText);
                     });
                 });
+
+                $scope.download = function($event, file) {
+                    $event.preventDefault();
+                    window.location = file.url;
+                }
 
                 $scope.click = function(file) {
                     switch(file.attrs.mode_string[0]) {

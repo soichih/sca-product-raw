@@ -10,7 +10,7 @@
     <span class="text-muted">(empty)</span>
 </p>
 
-<div ng-repeat-start="file in files" class="slide-down sca-product-raw-file" ng-click="click(file)">
+<div ng-repeat-start="file in files" class="slide-down sca-product-raw-file">
 
     <!--modified date-->
     <span class="sca-product-raw-item sca-product-raw-modified" title="{{file.attrs.mtime*1000|date:'medium'}}">
@@ -22,9 +22,23 @@
         {{file.attrs.size|bytes}}
     </span>
 
-    <span class="sca-product-raw-item sca-product-raw-ctrl text-muted"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
+    <!--
+    <span class="sca-product-raw-item sca-product-raw-ctrl text-muted" ng-click="">
+        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+    </span>
+    -->
+    <div class="dropdown sca-product-raw-item sca-product-raw-ctrl">
+      <div class="dropdown-toggle" data-toggle="dropdown">
+         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+      </div>
+      <ul class="dropdown-menu">
+         <li><a href="#" ng-click="download($event, file)">Download</a></li>
+      </ul>
+    </div>
 
+    <!-- name-->
     <span 
+        ng-click="click(file)"
         style="padding-left: {{indent}}em;"
         class="sca-product-raw-item sca-product-raw-name">
 
@@ -49,4 +63,10 @@
     <br clear="both">
 </div>
 <sca-product-raw-dir ng-repeat-end 
-    indent="indent+1" taskid="taskid" path="file.path" ng-if="file.open"></sca-product-raw-dir>
+    indent="indent+1" 
+    taskid="taskid" 
+    path="file.path" 
+    ng-if="file.open">
+</sca-product-raw-dir>
+
+
