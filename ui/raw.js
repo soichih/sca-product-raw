@@ -3,27 +3,25 @@
 
     //https://github.com/danialfarid/ng-file-upload
     var service = angular.module('sca-product-raw', [ ]);
-    service.directive('scaProductRaw', function(toaster, $http, $timeout, scaTask, appconf) {
+    service.directive('scaProductRaw', function(toaster, $http, $timeout, appconf) {
         return {
             restrict: 'E',
             scope: {
-                taskid: '=',
+                //taskid: '=',
+                task: '=',
                 path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             }, 
             templateUrl: 'node_modules/sca-product-raw/ui/raw.html',
             controller: function($scope) {
-                function load_resource(resource_id) {
-                    if(!resource_id) return;
+                function load_resource() {
+                    if(!$scope.task.resource_id) return;
                     //load resource detail
-                    console.log("loading resource detail:"+resource_id);
                     $http.get(appconf.wf_api+"/resource/", {
                         params: {
-                            find: JSON.stringify({ _id: resource_id })
+                            find: JSON.stringify({ _id: $scope.task.resource_id })
                         }
                     }).then(function(res) {
                         if(res.data.resources && res.data.resources.length == 1) {
-                            //console.log("loaded resource details");
-                            //console.dir(res.data.resources);
                             $scope.resource_detail = res.data.resources[0];
                         } else {
                             console.error("couldn't load resource detail: ");
@@ -35,6 +33,7 @@
                 }
                 
                 //need to load task so that I can load resource
+                /*
                 var t = scaTask.get($scope.taskid);
                 t._promise.then(function() {
                     $scope.task = t;
@@ -43,47 +42,54 @@
                         load_resource(t.resource_id);
                     });
                 });
+                */
+                if($scope.task.resource_id) load_resource();
+                else {
+                    //if resource_id is not set yet, wait for it to be set
+                    $scope.$watch('task.resource_id', function() {          
+                        load_resource();
+                    });
+                }
             }
         };
     });
 
-    service.directive('scaProductRawDir', function(appconf, $http, toaster, scaTask) {
+    service.directive('scaProductRawDir', function(appconf, $http, toaster) {
         return {
             restrict: 'E',
             scope: {
-                taskid: '=',
+                task: '=',
                 indent: '=',
                 path: '=?', //if empty, it will be set to instantce_id / task_id (relative to task dir)
             },
             templateUrl: 'node_modules/sca-product-raw/ui/dir.html',
             controller: function($scope) {
-                console.log("loading directory taskid:"+$scope.taskid);
+                //console.log("loading directory taskid:"+$scope.task._id);
                 $scope.indent_child = $scope.indent+1;
                 if(!$scope.path) $scope.path = "";
 
                 this.getNumber = function(num) { return new Array(num); };
 
-                //start by loading task
-                var task = scaTask.get($scope.taskid);
-                task._promise.then(function() {
-                    $scope.taskdir = task.instance_id+"/"+task._id;
-                    if(!task.resource_id) {
-                        console.error("sca-product-raw initialized on task with no resource_id");
-                        return;
-                    }
+                $scope.taskdir = $scope.task.instance_id+"/"+$scope.task._id;
+                if(!$scope.task.resource_id) {
+                    console.error("sca-product-raw initialized on task with no resource_id");
+                    return;
+                }
 
+                function loaddir() {
                     $scope.loading = true;
-                    //console.log("ls resource:"+task.resource_id+" path:"+$scope.taskdir+"/"+$scope.path);
-                    $http.get(appconf.wf_api+"/resource/ls/"+task.resource_id, {
+                    //console.log("ls resource:"+$scope.task.resource_id+" path:"+$scope.taskdir+"/"+$scope.path);
+                    $http.get(appconf.wf_api+"/resource/ls/"+$scope.task.resource_id, {
                         params: { path: $scope.taskdir+"/"+$scope.path }
                     })
                     .then(function(res) {
                         $scope.loading = false;
                         $scope.files = res.data.files;
                         var jwt = localStorage.getItem(appconf.jwt_id);
+                        //TODO - remember file.open
                         $scope.files.forEach(function(file) {
                             file.path = $scope.path+"/"+file.filename;
-                            file.url = appconf.wf_api+"/resource/download?r="+task.resource_id+
+                            file.url = appconf.wf_api+"/resource/download?r="+$scope.task.resource_id+
                                 "&p="+encodeURIComponent($scope.taskdir+file.path)+
                                 "&at="+jwt;
                         });
@@ -93,7 +99,15 @@
                         //ls could fail if taskdir isn't setup yet (or task starup fails).. so let's not display this to the UI
                         if(res.data && res.data.message) $scope.error = res.data.message;
                     });
+                }
+
+                loaddir();
+                /*
+                $scope.$watch('task.next_date', function() {          
+                    //task updated.. check directory list
+                    loaddir();
                 });
+                */ 
 
                 $scope.download = function($event, file) {
                     $event.preventDefault();
