@@ -23,5 +23,5 @@ if [ -f finished ]; then
 fi
 
 #assumed to be running... show the last lines from boot.log
-tail -3 stdout.log
+echo "running: " `tail -1 stdout.log`
 exit 0
