@@ -9,6 +9,7 @@ import errno
 import sys
 import shutil
 import subprocess
+import cgi
 
 block_sz = 8192*10
 
@@ -39,9 +40,18 @@ if "download" in config:
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
         try:
             u = urllib2.urlopen(url)
-            file_name = url.split('/')[-1]
-            f = open(dir+'/'+file_name, 'w')
             meta = u.info()
+
+            #use filename specified via content-disposition or guess it from the url
+            file_name = url.split('/')[-1]
+            disphead = meta.getheaders("Content-Disposition")
+            print disphead
+            if disphead: 
+                value, params = cgi.parse_header(disphead[0])
+                file_name = params["filename"]
+
+            #and now we aree open for output
+            f = open(dir+'/'+file_name, 'w')
 
             contentlength = meta.getheaders("Content-Length")
             if len(contentlength) == 1:
