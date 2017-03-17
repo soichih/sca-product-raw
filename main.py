@@ -25,6 +25,14 @@ with open('config.json') as config_json:
 opcount = 0 #number of requested operations
 products = []
 
+def append_opt(taropt, cmd):
+    if taropt == "gz":
+        cmd.append("--gzip")
+    if taropt == "bz2":
+        cmd.append("--bzip2")
+    if taropt  == "xz":
+        cmd.append("--xz")
+
 #download remote file via urllib2
 if "download" in config:
     for file in config["download"]:
@@ -42,16 +50,26 @@ if "download" in config:
             u = urllib2.urlopen(url)
             meta = u.info()
 
-            #use filename specified via content-disposition or guess it from the url
-            file_name = url.split('/')[-1]
-            disphead = meta.getheaders("Content-Disposition")
-            print disphead
-            if disphead: 
-                value, params = cgi.parse_header(disphead[0])
-                file_name = params["filename"]
+            if "untar" in file:
+                print "untar requested for download"
+                cmd = ["tar", "-x"]
+                append_opt(file["untar"], cmd)
+                cmd.append("--directory="+file["dir"])
 
-            #and now we aree open for output
-            f = open(dir+'/'+file_name, 'w')
+                print cmd
+                untar = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+                f = untar.stdin
+            else:
+                #use filename specified via content-disposition or guess it from the url
+                file_name = url.split('/')[-1]
+                disphead = meta.getheaders("Content-Disposition")
+                print disphead
+                if disphead: 
+                    value, params = cgi.parse_header(disphead[0])
+                    file_name = params["filename"]
+
+                #open file to output directly
+                f = open(dir+'/'+file_name, 'w')
 
             contentlength = meta.getheaders("Content-Length")
             if len(contentlength) == 1:
@@ -61,7 +79,7 @@ if "download" in config:
                 print "Content-Length not set.. can't figure out the final file size"
                 print meta
 
-            print "Downloading: %s Bytes: %s" % (file_name, file_size)
+            print "Downloading: %s Bytes: %s" % (url, file_size)
 
             file_size_dl = 0
             progress_time = time.time()
@@ -167,14 +185,6 @@ if "copy" in config:
             requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 
-def append_opt(taropt, cmd):
-    if taropt == "gz":
-        cmd.append("--gzip")
-    if taropt == "bz2":
-        cmd.append("--bzip2")
-    if taropt  == "xz":
-        cmd.append("--xz")
-
 #create tar file from local directory 
 if "tar" in config:
     for file in config["tar"]:
@@ -238,7 +248,7 @@ if "untar" in config:
             cmd.append("--directory="+dest)
             cmd.append("--file="+src)
 
-            print cmd
+            #print cmd
             retcode = subprocess.call(cmd)
             if retcode == 0: 
                 requests.post(progress_url, json={"progress": 1, "status": "finished"});
