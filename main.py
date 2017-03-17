@@ -51,6 +51,8 @@ if "download" in config:
             meta = u.info()
 
             if "untar" in file:
+                products.append({"dirname": dir+"/"+file_name})
+
                 print "untar requested for download"
                 cmd = ["tar", "-x"]
                 append_opt(file["untar"], cmd)
@@ -70,6 +72,7 @@ if "download" in config:
 
                 #open file to output directly
                 f = open(dir+'/'+file_name, 'w')
+                products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
 
             contentlength = meta.getheaders("Content-Length")
             if len(contentlength) == 1:
@@ -105,7 +108,6 @@ if "download" in config:
                     print status
 
             requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
             f.close()
 
         except Exception as e:
