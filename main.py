@@ -51,7 +51,7 @@ if "download" in config:
             meta = u.info()
 
             if "untar" in file:
-                products.append({"dirname": dir+"/"+file_name})
+                products.append({"dirname": dir+"/"+dir})
 
                 print "untar requested for download"
                 cmd = ["tar", "-x"]
