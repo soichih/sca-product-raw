@@ -5,7 +5,6 @@ import urllib2
 import requests
 import time
 import errno
-#import tarfile
 import sys
 import shutil
 import subprocess
@@ -141,6 +140,7 @@ if "symlink" in config:
                     os.makedirs(dirname)            
 
             try:
+		src = os.path.abspath(src)
                 os.symlink(src, dest)
                 requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 products.append({"filename": dest})
