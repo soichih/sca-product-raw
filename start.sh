@@ -6,10 +6,10 @@
 export LANG="en_US.UTF-8"
 
 #allows test execution
-if [ -z $SCA_WORKFLOW_DIR ]; then export SCA_WORKFLOW_DIR=`pwd`; fi
-if [ -z $SCA_TASK_DIR ]; then export SCA_TASK_DIR=`pwd`; fi
-if [ -z $SCA_SERVICE_DIR ]; then export SCA_SERVICE_DIR=`pwd`; fi
-if [ -z $SCA_PROGRESS_URL ]; then export SCA_PROGRESS_URL="https://soichi7.ppa.iu.edu/api/progress/status/_sca.test"; fi
+#if [ -z $SCA_WORKFLOW_DIR ]; then export SCA_WORKFLOW_DIR=`pwd`; fi
+#if [ -z $SCA_TASK_DIR ]; then export SCA_TASK_DIR=`pwd`; fi
+if [ -z $SERVICE_DIR ]; then export SERVICE_DIR=`pwd`; fi
+if [ -z $PROGRESS_URL ]; then export PROGRESS_URL="https://soichi7.ppa.iu.edu/api/progress/status/_sca.test"; fi
 
 #do bigred2 specific things
 echo $HOME | grep -i bigred > /dev/null
@@ -20,7 +20,7 @@ fi
 rm -f finished
 echo "starting main.py"
 (
-nohup time $SCA_SERVICE_DIR/main.py > stdout.log 2> stderr.log 
+nohup time $SERVICE_DIR/main.py > stdout.log 2> stderr.log 
 echo $? > finished 
 ) &
 

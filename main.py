@@ -43,7 +43,7 @@ if "download" in config:
             os.makedirs(dir)
 
         url = file["url"]
-        progress_url = os.environ["SCA_PROGRESS_URL"]+".file"+str(len(products));
+        progress_url = os.environ["PROGRESS_URL"]+".file"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
         try:
             u = urllib2.urlopen(url)
@@ -125,7 +125,7 @@ if "symlink" in config:
         print "Handling symlink request",file["src"]
         src = file["src"]
 
-        progress_url = os.environ["SCA_PROGRESS_URL"]+".symlink"+str(len(products));
+        progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
         try:
             dest = src.split('/')[-1]
@@ -163,7 +163,7 @@ if "copy" in config:
         print "Handling copy request",file["src"]
         src = file["src"]
 
-        progress_url = os.environ["SCA_PROGRESS_URL"]+".copy"+str(len(products));
+        progress_url = os.environ["PROGRESS_URL"]+".copy"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
         try:
             dest = src.split('/')[-1]
@@ -196,7 +196,7 @@ if "tar" in config:
         dest = file["dest"]
         print "Handling tar request from",src,"to",dest
 
-        progress_url = os.environ["SCA_PROGRESS_URL"]+".tar"+str(len(products));
+        progress_url = os.environ["PROGRESS_URL"]+".tar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
         try:
 
@@ -239,7 +239,7 @@ if "untar" in config:
             print "creating dest dir:",dest
             os.makedirs(dest)            
 
-        progress_url = os.environ["SCA_PROGRESS_URL"]+".untar"+str(len(products));
+        progress_url = os.environ["PROGRESS_URL"]+".untar"+str(len(products));
         requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
 
