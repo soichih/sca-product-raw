@@ -1,0 +1,30 @@
+{
+"download": [
+    {
+    "url-gz": "https://brain-life.org/api/warehouse/dataset/download/5941a37f803e87394b473a2b?at=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JyYWluLWxpZmUub3JnL2F1dGgiLCJleHAiOjE0OTk3OTY3MzQuMjE2LCJpYXQiOjE0OTk3MTAzMzQuMjE2LCJzY29wZXMiOnsic2NhIjpbInVzZXIiXSwiYnJhaW5saWZlIjpbInVzZXIiXX0sInN1YiI6NDMsImdpZHMiOlsxXSwicHJvZmlsZSI6eyJ1c2VybmFtZSI6ImtpdGNoZWxsIiwiZW1haWwiOiJraXRjaGVsbEBpbmRpYW5hLmVkdSIsImZ1bGxuYW1lIjoiTGluZHNleSBLaXRjaGVsbCJ9fQ.viUc43CeY_iIVTmtxFAnKxTwC8nDsYOItBpqLxn8eOJ1vHo_J5jZuTx-iIraZ_dQ8CWLZPWpYHmJk0iNLVAEsYP_UEZXqVvrTprYm9fzQVw_I6nLHBPWLk3Hf23pq7Hwo6-j9QYtnjR_nD36f3lNsA0Ix9uGiWdG1exWyURR74LSmNivHai8yrsgm-SMJOW10h3V_yICe62WhMe081XVWlyxVq2rmAvXpelXI1yAj9tfzWRy4Z9t2z0gI3DLzwpE5h9xYNVJTsR2_E2OEZYG5iLGEIPPT5AqnklKdVq-cavCS6X4hsvgK48k9v9XfUKxzTpz79DzMsQoziLEjv7Fow",
+    "url": "https://dev1.soichi.us/api/warehouse/dataset/download/5941a6e86a5bbf6242bc3438?at=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NjYS5pdS5lZHUvYXV0aCIsImlhdCI6MTQ5OTEyODI4Ny44MTksInN1YiI6MSwic2NvcGVzIjp7IndhcmVob3VzZSI6WyJ1c2VyIl19LCJwcm9maWxlIjp7InVzZXJuYW1lIjoiaGF5YXNoaXMiLCJlbWFpbCI6ImhheWFzaGlzQGl1LmVkdSIsImZ1bGxuYW1lIjoiU29pY2hpIEhheWFzaGkgKGZvcmV2ZXIpIn19.HH1p1Asy2GVZg82LXsLtgq2nYskqZa59jTt-ogRNItTnn2UISn9weEKSENyMlcallVl5dK0BGp2xAyMPAeV2JKa7bVdIrObPNfZClf2dr4YMFyyCKuyEFfGey_i08qA2qJiECPu5U5UVmmiI-GRHx5A-K4TswSwBBca2wGAbUMd4E5QpCA_vj24QXBfPU_4dOTTDPTNJjoRU9706BssaWMf-z3qhPUS4ITFRjkAQHXGwvlh5d4_IdxJQG0EZre54GmqdV6GXMouG-iJqQ8SgldU9TF4IsaHlB5LAYiTnFmuqzt8ZKGwldmwELjdvYgASzuCfGMQVXQErzSuug8LfmA",
+    "untar": "auto",
+    "dir": "test"
+    }
+],
+"symlink": [
+	{
+    "src": "../auth/Dockerfile",
+    "dest": "test/Dockerfile"
+	}
+],
+"tar": [
+	{
+	    "src": "../sca-product-raw",
+	    "dest": "test.tar.gz",
+	    "opts": "auto"
+	}
+],
+"untar": [
+	{
+	    "src": "test.tar.gz",
+	    "dest": "test2",
+	    "opts": "auto"
+	}
+]}
+

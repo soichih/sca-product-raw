@@ -24,12 +24,14 @@ with open('config.json') as config_json:
 opcount = 0 #number of requested operations
 products = []
 
-def append_opt(taropt, cmd):
-    if taropt == "gz":
+def ext2taropt(ext, cmd):
+    if ext == "tar":
+        None
+    if ext == "gz":
         cmd.append("--gzip")
-    if taropt == "bz2":
+    if ext == "bz2":
         cmd.append("--bzip2")
-    if taropt  == "xz":
+    if ext == "xz":
         cmd.append("--xz")
 
 #download remote file via urllib2
@@ -43,31 +45,40 @@ if "download" in config:
             os.makedirs(dir)
 
         url = file["url"]
-        progress_url = os.environ["PROGRESS_URL"]+".file"+str(len(products));
-        requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
+        if "PROGRESS_URL" in os.environ:
+            progress_url = os.environ["PROGRESS_URL"]+".file"+str(len(products));
+            requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
+
         try:
             u = urllib2.urlopen(url)
             meta = u.info()
 
+            #use filename specified via content-disposition or guess it from the url
+            file_name = url.split('/')[-1]
+            disphead = meta.getheaders("Content-Disposition")
+            if disphead: 
+                value, params = cgi.parse_header(disphead[0])
+                file_name = params["filename"]
+
+            #create writestream 
             if "untar" in file:
                 products.append({"dirname": dir})
 
                 print "untar requested for download"
                 cmd = ["tar", "-x"]
-                append_opt(file["untar"], cmd)
+                ext = file["untar"]
+
+                if ext == "auto":
+                    ext = os.path.splitext(file_name)[1][1:]
+                    print "auto-detecting untar ext",file_name, ext
+
+                ext2taropt(ext, cmd)
                 cmd.append("--directory="+file["dir"])
 
                 print cmd
                 untar = subprocess.Popen(cmd, stdin=subprocess.PIPE)
                 f = untar.stdin
             else:
-                #use filename specified via content-disposition or guess it from the url
-                file_name = url.split('/')[-1]
-                disphead = meta.getheaders("Content-Disposition")
-                print disphead
-                if disphead: 
-                    value, params = cgi.parse_header(disphead[0])
-                    file_name = params["filename"]
 
                 #open file to output directly
                 f = open(dir+'/'+file_name, 'w')
@@ -94,10 +105,11 @@ if "download" in config:
                 f.write(buffer)
 
                 if time.time() - progress_time > 0.5:
-                    if file_size:
-                        requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
-                    else:
-                        requests.post(progress_url, json={"msg": "Downloaded "+str(file_size_dl)+ " -- total size unknown"})
+                    if "PROGRESS_URL" in os.environ:
+                        if file_size:
+                            requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
+                        else:
+                            requests.post(progress_url, json={"msg": "Downloaded "+str(file_size_dl)+ " -- total size unknown"})
 
                     progress_time = time.time()
                     if file_size:
@@ -106,13 +118,15 @@ if "download" in config:
                         status = r"%10d" % (file_size_dl)
                     print status
 
-            requests.post(progress_url, json={"progress": 1, "status": "finished"});
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"progress": 1, "status": "finished"});
             f.close()
 
         except Exception as e:
             print "failed to download "+url
             print e 
-            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #(experimental)
 #symlink files from local directory to task directory (dest is optional)
@@ -125,8 +139,10 @@ if "symlink" in config:
         print "Handling symlink request",file["src"]
         src = file["src"]
 
-        progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(len(products));
-        requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+        if "PROGRESS_URL" in os.environ:
+            progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(len(products));
+            requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+
         try:
             dest = src.split('/')[-1]
             if "dest" in file:
@@ -142,19 +158,22 @@ if "symlink" in config:
             try:
 		src = os.path.abspath(src)
                 os.symlink(src, dest)
-                requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 products.append({"filename": dest})
             except OSError, e:
                 if e.errno == errno.EEXIST:
                     os.remove(dest)
                     os.symlink(src, dest)
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                    if "PROGRESS_URL" in os.environ:
+                        requests.post(progress_url, json={"progress": 1, "status": "finished"});
                     products.append({"filename": dest})
 
         except Exception as e:
             print "failed to symlink:"+src
             print e 
-            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 if "copy" in config:
     for file in config["copy"]:
@@ -163,8 +182,9 @@ if "copy" in config:
         print "Handling copy request",file["src"]
         src = file["src"]
 
-        progress_url = os.environ["PROGRESS_URL"]+".copy"+str(len(products));
-        requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+        if "PROGRESS_URL" in os.environ:
+            progress_url = os.environ["PROGRESS_URL"]+".copy"+str(len(products));
+            requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
         try:
             dest = src.split('/')[-1]
             if "dest" in file:
@@ -178,14 +198,15 @@ if "copy" in config:
                     os.makedirs(dirname)            
 
             shutil.copyfile(src, dest)
-            requests.post(progress_url, json={"progress": 1, "status": "finished"});
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"progress": 1, "status": "finished"});
             products.append({"filename": dest})
 
         except Exception as e:
             print "failed to copy:"+src
             print e 
-            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
-
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #create tar file from local directory 
 if "tar" in config:
@@ -196,15 +217,23 @@ if "tar" in config:
         dest = file["dest"]
         print "Handling tar request from",src,"to",dest
 
-        progress_url = os.environ["PROGRESS_URL"]+".tar"+str(len(products));
-        requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
+        if "PROGRESS_URL" in os.environ:
+            progress_url = os.environ["PROGRESS_URL"]+".tar"+str(len(products));
+            requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
         try:
 
             #taropt can be "gz" or "bz2"..
             cmd = ["tar", "-c"]
             if "opts" in file:
-                append_opt(file["opts"], cmd)
 
+                ext = file["opts"]
+                if ext == "auto":
+                    ext = os.path.splitext(dest)[1][1:]
+                    print "auto-detecting dest tar ext",dest, ext
+
+                ext2taropt(ext, cmd)
+
+            #TODO - passing "dir" to dirname() will result in empty string??
             cmd.append("--directory="+os.path.dirname(src))
             cmd.append("--file="+dest)
             cmd.append(os.path.basename(src))
@@ -214,18 +243,22 @@ if "tar" in config:
             #now create tar file
             retcode = subprocess.call(cmd)
             if retcode == 0: 
-                requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 products.append({"filename": dest})
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
             else:
-                requests.post(progress_url, json={"status": "failed"});
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"status": "failed"});
                  
         except Exception as e:
             print "failed to tar:"+src
             print e 
-            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #untar .tar.gz to local directory
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
+#TODO - maybe I should deprecate this?
 if "untar" in config:
     for file in config["untar"]:
         opcount += 1
@@ -239,13 +272,19 @@ if "untar" in config:
             print "creating dest dir:",dest
             os.makedirs(dest)            
 
-        progress_url = os.environ["PROGRESS_URL"]+".untar"+str(len(products));
-        requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
+        if "PROGRESS_URL" in os.environ:
+            progress_url = os.environ["PROGRESS_URL"]+".untar"+str(len(products));
+            requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
-
             cmd = ["tar", "-x"]
             if "opts" in file:
-                append_opt(file["opts"], cmd)
+
+                ext = file["opts"]
+                if ext == "auto":
+                    ext = os.path.splitext(src)[1][1:]
+                    print "auto-detecting untar ext",src, ext
+
+                ext2taropt(ext, cmd)
 
             cmd.append("--directory="+dest)
             cmd.append("--file="+src)
@@ -253,17 +292,21 @@ if "untar" in config:
             #print cmd
             retcode = subprocess.call(cmd)
             if retcode == 0: 
-                requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+
                 #TODO - dest only points to where we are unarchiving. 
                 #I should add the base directory name inside the ardhive?
                 products.append({"filename": dest})
             else:
-                requests.post(progress_url, json={"status": "failed"});
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"status": "failed"});
 
         except Exception as e:
             print "failed to untar:"+src
             print e 
-            requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            if "PROGRESS_URL" in os.environ:
+                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
