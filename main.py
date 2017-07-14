@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import cgi
 
-block_sz = 8192*10
+block_sz = 8192*1000
 
 #didn't cure the problem..
 #os.environ["LANG"] = "en_US.UTF-8"
@@ -60,6 +60,14 @@ if "download" in config:
                 value, params = cgi.parse_header(disphead[0])
                 file_name = params["filename"]
 
+            contentlength = meta.getheaders("Content-Length")
+            if len(contentlength) == 1:
+                file_size = int(meta.getheaders("Content-Length")[0])
+            else:
+                file_size = None
+                print "Content-Length not set.. can't figure out the final file size"
+                print meta
+
             #create writestream 
             if "untar" in file:
                 products.append({"dirname": dir})
@@ -77,23 +85,14 @@ if "download" in config:
 
                 print cmd
                 untar = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-                f = untar.stdin
+                writestream = untar.stdin
             else:
-
-                #open file to output directly
-                f = open(dir+'/'+file_name, 'w')
-                products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
-
-            contentlength = meta.getheaders("Content-Length")
-            if len(contentlength) == 1:
-                file_size = int(meta.getheaders("Content-Length")[0])
-            else:
-                file_size = None
-                print "Content-Length not set.. can't figure out the final file size"
-                print meta
+                print "using",dir+"/"+file_name
+                writestream = open(dir+'/'+file_name, 'w')
 
             print "Downloading: %s Bytes: %s" % (url, file_size)
 
+            #commencing download 
             file_size_dl = 0
             progress_time = time.time()
             while True:
@@ -102,8 +101,9 @@ if "download" in config:
                     break
 
                 file_size_dl += len(buffer)
-                f.write(buffer)
+                writestream.write(buffer)
 
+                #report progress
                 if time.time() - progress_time > 0.5:
                     if "PROGRESS_URL" in os.environ:
                         if file_size:
@@ -120,7 +120,10 @@ if "download" in config:
 
             if "PROGRESS_URL" in os.environ:
                 requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            f.close()
+            writestream.close()
+
+            if "untar" not in file:
+                products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
 
         except Exception as e:
             print "failed to download "+url
