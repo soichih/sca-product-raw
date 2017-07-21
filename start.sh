@@ -14,7 +14,8 @@ if [ -z $PROGRESS_URL ]; then export PROGRESS_URL="https://soichi7.ppa.iu.edu/ap
 #do bigred2 specific things
 echo $HOME | grep -i bigred > /dev/null
 if [ $? -eq 0 ]; then
-    module load python
+    #this started failing
+    #module load python
 fi
 
 rm -f finished
