@@ -19,6 +19,6 @@ if [ $? -eq 0 ]; then
 fi
 
 echo "starting main.py"
-nohup python -u $SERVICE_DIR/main.py > stdout.log 2> stderr.log || echo $? > finished & 
+nohup python -u $SERVICE_DIR/main.py > stdout.log 2> stderr.log & 
 echo $! > pid
 

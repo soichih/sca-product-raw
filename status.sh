@@ -28,6 +28,6 @@ if [ -f pid ]; then
     fi
 fi
 
-echo "can't determine the status!"
+echo "can't determine the status. maybe not started yet?"
 exit 3
 

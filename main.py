@@ -10,6 +10,8 @@ import shutil
 import subprocess
 import cgi
 
+print "starting service"
+
 block_sz = 8192*1000
 
 #didn't cure the problem..
@@ -21,7 +23,6 @@ block_sz = 8192*1000
 with open('config.json') as config_json:
     config = json.load(config_json)
 
-print "starting"
 
 opcount = 0 #number of requested operations
 products = []
@@ -318,9 +319,14 @@ if "untar" in config:
 with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
 
+#write finished
+f = open('finished', 'w')
 if opcount != len(products):
     print "Not all request successfully processed."
-    sys.exit(1) 
+    f.write('1')
+else:
+    print "All request completed successfully."
+    f.write('0')
+f.close()
 
-print "All request completed successfully."
 
