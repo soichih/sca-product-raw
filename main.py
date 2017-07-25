@@ -21,6 +21,8 @@ block_sz = 8192*1000
 with open('config.json') as config_json:
     config = json.load(config_json)
 
+print "starting"
+
 opcount = 0 #number of requested operations
 products = []
 
@@ -38,6 +40,8 @@ def ext2taropt(ext, cmd):
 if "download" in config:
     for file in config["download"]:
         opcount += 1
+
+	print "downloading",file
 
         #TODO - should I default it to "."?
         dir=file["dir"]
@@ -116,7 +120,7 @@ if "download" in config:
                         status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
                     else:
                         status = r"%10d" % (file_size_dl)
-                    print status
+		    print "Downloading: %s Bytes: %s" % (file_name, status)
 
             if "PROGRESS_URL" in os.environ:
                 requests.post(progress_url, json={"progress": 1, "status": "finished"});
@@ -139,7 +143,7 @@ if "symlink" in config:
     for file in config["symlink"]:
         opcount += 1
 
-        print "Handling symlink request",file["src"]
+        print "Handling symlink request",file
         src = file["src"]
 
         if "PROGRESS_URL" in os.environ:
@@ -182,7 +186,7 @@ if "copy" in config:
     for file in config["copy"]:
         opcount += 1
 
-        print "Handling copy request",file["src"]
+        print "Handling copy request",file
         src = file["src"]
 
         if "PROGRESS_URL" in os.environ:
@@ -218,7 +222,7 @@ if "tar" in config:
 
         src = file["src"]
         dest = file["dest"]
-        print "Handling tar request from",src,"to",dest
+        print "Handling tar request",file
 
         if "PROGRESS_URL" in os.environ:
             progress_url = os.environ["PROGRESS_URL"]+".tar"+str(len(products));
@@ -268,7 +272,7 @@ if "untar" in config:
 
         src = file["src"]
         dest = file["dest"]
-        print "Handling untar request from",src,"to",dest
+        print "Handling untar", file
 
         #make sure dest dir exists
         if not os.path.isdir(dest):
@@ -315,8 +319,8 @@ with open("products.json", "w") as fp:
     json.dump([{"type": "raw", "files":products}], fp)
 
 if opcount != len(products):
-    print >> sys.stderr, "Not all request successfully processed."
+    print "Not all request successfully processed."
     sys.exit(1) 
 
-print "All request completed successfully"
+print "All request completed successfully."
 
