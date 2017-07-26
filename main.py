@@ -42,14 +42,18 @@ if "download" in config:
     for file in config["download"]:
         opcount += 1
 
-	print "downloading",file
+        url = file["url"]
+	url_qpos = url.index("?")
+	url_to_show = url
+	if url_qpos > 0:
+	    url_to_show=url[0:url_qpos]
+	print "downloading",url_to_show
 
         #TODO - should I default it to "."?
         dir=file["dir"]
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-        url = file["url"]
         if "PROGRESS_URL" in os.environ:
             progress_url = os.environ["PROGRESS_URL"]+".file"+str(len(products));
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
