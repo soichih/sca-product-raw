@@ -43,11 +43,14 @@ if "download" in config:
         opcount += 1
 
         url = file["url"]
-	url_qpos = url.index("?")
+
+        #shorten url if we could.. some url contains token..
+        #TODO - not sure if this is working
 	url_to_show = url
+	url_qpos = url.index("?")
 	if url_qpos > 0:
 	    url_to_show=url[0:url_qpos]
-	print "downloading",url_to_show
+	print "Downloading",url_to_show
 
         #TODO - should I default it to "."?
         dir=file["dir"]
