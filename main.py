@@ -47,9 +47,12 @@ if "download" in config:
         #shorten url if we could.. some url contains token..
         #TODO - not sure if this is working
 	url_to_show = url
-	url_qpos = url.index("?")
-	if url_qpos > 0:
-	    url_to_show=url[0:url_qpos]
+        try: 
+            url_qpos = url.index("?")
+            if url_qpos > 0:
+                url_to_show=url[0:url_qpos]
+        except ValueError:
+            None
 	print "Downloading",url_to_show
 
         #TODO - should I default it to "."?
