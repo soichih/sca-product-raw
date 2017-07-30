@@ -45,15 +45,13 @@ if "download" in config:
         url = file["url"]
 
         #shorten url if we could.. some url contains token..
-        #TODO - not sure if this is working
-	#url_to_show = url
-        #try: 
-        #    url_qpos = url.index("?")
-        #    if url_qpos > 0:
-        #        url_to_show=url[0:url_qpos]
-        #except ValueError:
-        #    None
-	#print "Downloading",url_to_show
+	url_to_show = url
+        try: 
+            url_qpos = url.index("?")
+            if url_qpos > 0:
+                url_to_show=url[0:url_qpos]
+        except ValueError:
+            None
 
         #TODO - should I default it to "."?
         dir=file["dir"]
@@ -105,7 +103,7 @@ if "download" in config:
                 print "using",dir+"/"+file_name
                 writestream = open(dir+'/'+file_name, 'w')
 
-            print "Downloading: %s Bytes: %s" % (url, file_size)
+            #print "Downloading: %s Bytes: %s" % (url_to_show, file_size)
 
             #commencing download 
             file_size_dl = 0
