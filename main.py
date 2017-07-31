@@ -83,7 +83,6 @@ if "download" in config:
 
             #create writestream 
             if "untar" in file:
-                products.append({"dirname": dir})
 
                 print "untar requested for download"
                 cmd = ["tar", "-x"]
@@ -137,6 +136,8 @@ if "download" in config:
 
             if "untar" not in file:
                 products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
+            else:
+                products.append({"dirname": dir})
 
         except Exception as e:
             print "failed to download "+url
