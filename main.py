@@ -95,7 +95,7 @@ if "download" in config:
                 ext2taropt(ext, cmd)
                 cmd.append("--directory="+file["dir"])
 
-                print cmd
+                #print cmd
                 untar = subprocess.Popen(cmd, stdin=subprocess.PIPE)
                 writestream = untar.stdin
             else:
@@ -254,7 +254,7 @@ if "tar" in config:
             cmd.append("--directory="+os.path.dirname(src))
             cmd.append("--file="+dest)
             cmd.append(os.path.basename(src))
-            print cmd
+            #print cmd
 
             #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
             #now create tar file
