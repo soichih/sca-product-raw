@@ -90,7 +90,7 @@ if "download" in config:
 
                 if ext == "auto":
                     ext = os.path.splitext(file_name)[1][1:]
-                    print "auto-detecting untar ext",file_name, ext
+                    #print "auto-detecting untar ext",file_name, ext
 
                 ext2taropt(ext, cmd)
                 cmd.append("--directory="+file["dir"])
@@ -246,7 +246,7 @@ if "tar" in config:
                 ext = file["opts"]
                 if ext == "auto":
                     ext = os.path.splitext(dest)[1][1:]
-                    print "auto-detecting dest tar ext",dest, ext
+                    #print "auto-detecting dest tar ext",dest, ext
 
                 ext2taropt(ext, cmd)
 
@@ -299,7 +299,7 @@ if "untar" in config:
                 ext = file["opts"]
                 if ext == "auto":
                     ext = os.path.splitext(src)[1][1:]
-                    print "auto-detecting untar ext",src, ext
+                    #print "auto-detecting untar ext",src, ext
 
                 ext2taropt(ext, cmd)
 
