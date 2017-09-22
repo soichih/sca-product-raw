@@ -1,6 +1,10 @@
 {
   "download": [
     {
+      "url": "http://www.brain-life.org/images/app-logos/app-acpcalign.png",
+      "dir": "testout"
+    },
+    {
       "url": "https://dev1.soichi.us/api/warehouse/dataset/download/5977afba3edf890a02ef8560?at=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NjYS5pdS5lZHUvYXV0aCIsImV4cCI6MTUwMTcyODIyMC41NTksInNjb3BlcyI6eyJzY2EiOlsidXNlciIsImFkbWluIiwidGVzdCJdLCJtY2EiOlsidXNlciIsImFkbWluIl0sImRpY29tIjpbInVzZXIiLCJhZG1pbiJdfSwic3ViIjoxLCJnaWRzIjpbMSwyLDMsNCw2LDhdLCJwcm9maWxlIjp7InVzZXJuYW1lIjoiaGF5YXNoaXMiLCJlbWFpbCI6ImhheWFzaGlzQGl1LmVkdSIsImZ1bGxuYW1lIjoiU29pY2hpIEhheWFzaGkgKHJlYWwpIn0sImlhdCI6MTUwMTY0MTgyMH0.H1Kv0hchsY1Xf4LpHpy4j42hgtz0_Vu0Pq1iMm2vPiJunkfR_dUgoc0s7y9oulUFqstEP5fvPVijynWrTU3Y-P2jzE1HLoHbXn0nnBTU-C2UVcqlQ3GxQ2zOFx2MvPbbk4Mhm1Jiz-lW0CzCCksI2_pwksIB3ltde2nySG4O_1mK2BuAOy3XK0P1N6kr0_pjzEllkdKuzGO7SO1DTi4YmT7QVZdQdIVRSFWeHbTADILhITV-GOXHUF3NvjP4dFEfaqul8Nsxo8WiYjTp8W4-qcyn-IVSP5Sw7pdtxKe92LhooL5VYg6cVYrvKM-gNpDSd7YVNY0mZ8E6m522PzSaNA",
       "untar": "auto",
       "dir": "5977afba3edf890a02ef8560"

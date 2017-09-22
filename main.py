@@ -43,6 +43,7 @@ if "download" in config:
         opcount += 1
 
         url = file["url"]
+        print "downloading", url
 
         #shorten url if we could.. some url contains token..
 	url_to_show = url
@@ -102,8 +103,6 @@ if "download" in config:
                 print "using",dir+"/"+file_name
                 writestream = open(dir+'/'+file_name, 'w')
 
-            #print "Downloading: %s Bytes: %s" % (url_to_show, file_size)
-
             #commencing download 
             file_size_dl = 0
             progress_time = time.time()
@@ -130,14 +129,19 @@ if "download" in config:
                         status = r"%10d" % (file_size_dl)
 		    print "Downloading: %s Bytes: %s" % (file_name, status)
 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            writestream.close()
+            if u.getcode() == 200:
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                writestream.close()
 
-            if "untar" not in file:
-                products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
+                if "untar" not in file:
+                    products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
+                else:
+                    products.append({"dirname": dir})
             else:
-                products.append({"dirname": dir})
+                print "Download failed with code %d" % (u.getcode())
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"status": "failed", "msg": "non-200"})
 
         except Exception as e:
             print "failed to download "+url
@@ -325,8 +329,8 @@ if "untar" in config:
             if "PROGRESS_URL" in os.environ:
                 requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
-with open("products.json", "w") as fp:
-    json.dump([{"type": "raw", "files":products}], fp)
+with open("product.json", "w") as fp:
+    json.dump({"type": "raw", "files":products}, fp)
 
 #write finished
 f = open('finished', 'w')
