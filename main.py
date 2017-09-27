@@ -329,10 +329,10 @@ if "untar" in config:
             if "PROGRESS_URL" in os.environ:
                 requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
-with open("product.json", "w") as fp:
-    json.dump({"type": "raw", "files":products}, fp)
+#with open("product.json", "w") as fp:
+#    json.dump({"type": "raw", "files":products}, fp)
 
-#write finished
+#write finished (can't nohup catch this?)
 f = open('finished', 'w')
 if opcount != len(products):
     print "Not all request successfully processed."
