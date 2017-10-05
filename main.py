@@ -43,7 +43,8 @@ if "download" in config:
         opcount += 1
 
         url = file["url"]
-        print "downloading", url
+        #print "downloading", url #TODO- truncate the at=.....
+        print "downloading", file["dir"]
 
         #shorten url if we could.. some url contains token..
 	url_to_show = url
