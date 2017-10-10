@@ -12,7 +12,7 @@ import cgi
 
 print "starting service"
 
-block_sz = 8192*1000
+block_sz = 16*1024
 
 #didn't cure the problem..
 #os.environ["LANG"] = "en_US.UTF-8"
@@ -25,7 +25,7 @@ with open('config.json') as config_json:
 
 
 opcount = 0 #number of requested operations
-products = []
+success = 0 #number of request successfully fulfilled
 
 def ext2taropt(ext, cmd):
     if ext == "tar":
@@ -61,7 +61,7 @@ if "download" in config:
             os.makedirs(dir)
 
         if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".file"+str(len(products));
+            progress_url = os.environ["PROGRESS_URL"]+".file"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
 
         try:
@@ -131,14 +131,17 @@ if "download" in config:
 		    print "Downloading: %s Bytes: %s" % (file_name, status)
 
             if u.getcode() == 200:
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 writestream.close()
 
-                if "untar" not in file:
-                    products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
-                else:
-                    products.append({"dirname": dir})
+                if "PROGRESS_URL" in os.environ:
+                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+
+                #if "untar" not in file:
+                #    products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
+                #else:
+                #    products.append({"dirname": dir})
+                print "Successfully downloaded"
+                success += 1
             else:
                 print "Download failed with code %d" % (u.getcode())
                 if "PROGRESS_URL" in os.environ:
@@ -162,7 +165,7 @@ if "symlink" in config:
         src = file["src"]
 
         if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(len(products));
+            progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
 
         try:
@@ -182,14 +185,16 @@ if "symlink" in config:
                 os.symlink(src, dest)
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"progress": 1, "status": "finished"});
-                products.append({"filename": dest})
+                #products.append({"filename": dest})
+                success+=1
             except OSError, e:
                 if e.errno == errno.EEXIST:
                     os.remove(dest)
                     os.symlink(src, dest)
                     if "PROGRESS_URL" in os.environ:
                         requests.post(progress_url, json={"progress": 1, "status": "finished"});
-                    products.append({"filename": dest})
+                    #products.append({"filename": dest})
+                    success+=1
 
         except Exception as e:
             print "failed to symlink:"+src
@@ -205,7 +210,7 @@ if "copy" in config:
         src = file["src"]
 
         if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".copy"+str(len(products));
+            progress_url = os.environ["PROGRESS_URL"]+".copy"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
         try:
             dest = src.split('/')[-1]
@@ -222,7 +227,8 @@ if "copy" in config:
             shutil.copyfile(src, dest)
             if "PROGRESS_URL" in os.environ:
                 requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            products.append({"filename": dest})
+            #products.append({"filename": dest})
+            success += 1
 
         except Exception as e:
             print "failed to copy:"+src
@@ -240,7 +246,7 @@ if "tar" in config:
         print "Handling tar request",file
 
         if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".tar"+str(len(products));
+            progress_url = os.environ["PROGRESS_URL"]+".tar"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
         try:
 
@@ -265,7 +271,8 @@ if "tar" in config:
             #now create tar file
             retcode = subprocess.call(cmd)
             if retcode == 0: 
-                products.append({"filename": dest})
+                #products.append({"filename": dest})
+                success+=1
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"progress": 1, "status": "finished"});
             else:
@@ -295,7 +302,7 @@ if "untar" in config:
             os.makedirs(dest)            
 
         if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".untar"+str(len(products));
+            progress_url = os.environ["PROGRESS_URL"]+".untar"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
             cmd = ["tar", "-x"]
@@ -319,7 +326,8 @@ if "untar" in config:
 
                 #TODO - dest only points to where we are unarchiving. 
                 #I should add the base directory name inside the ardhive?
-                products.append({"filename": dest})
+                #products.append({"filename": dest})
+                success+=1
             else:
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"status": "failed"});
@@ -335,7 +343,7 @@ if "untar" in config:
 
 #write finished (can't nohup catch this?)
 f = open('finished', 'w')
-if opcount != len(products):
+if opcount != success:
     print "Not all request successfully processed."
     f.write('1')
 else:
