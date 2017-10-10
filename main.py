@@ -85,7 +85,6 @@ if "download" in config:
 
             #create writestream 
             if "untar" in file:
-
                 print "untar requested for download"
                 cmd = ["tar", "-x"]
                 ext = file["untar"]
@@ -133,8 +132,12 @@ if "download" in config:
             if u.getcode() == 200:
                 writestream.close()
 
+                if file_size and file_size != file_size_dl:
+                    raise Exception("Couldn't download the whole file.")
+
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"progress": 1, "status": "finished"});
+
 
                 #if "untar" not in file:
                 #    products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
