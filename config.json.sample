@@ -1,9 +1,9 @@
 {
     "download": [
         {
-            "dir": "59dbc721ab424f00591a9b58-2",
-            "untar": "auto",
-            "url": "https://brain-life.org/api/warehouse/dataset/download/59dbc721ab424f00591a9b58?at=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JyYWluLWxpZmUub3JnL2F1dGgiLCJleHAiOjE1MDc3NDI0NjUuMzQ1LCJzY29wZXMiOnsic2NhIjpbInVzZXIiLCJhZG1pbiJdLCJtY2EiOlsidXNlciJdLCJkaWNvbSI6WyJ1c2VyIl0sIndhcmVob3VzZSI6WyJhZG1pbiJdfSwic3ViIjoxLCJnaWRzIjpbMV0sInByb2ZpbGUiOnsidXNlcm5hbWUiOiJoYXlhc2hpcyIsImVtYWlsIjoiaGF5YXNoaXNAaXUuZWR1IiwiZnVsbG5hbWUiOiJTb2ljaGkgSGF5YXNoaSJ9LCJpYXQiOjE1MDc2NTYwNjV9.qmQ_KJReSkjVRGwo5iQ5AiCDOCSCMrz5736CZQ31apnbn_svlXNusn9deono51bRubFSWcd9RgbI5wk70KOIWZt-CPgYcrYg0XzMDPaJAEusqxYLgal6Hr-kKpuDaxpLX24_IoTGips6_0BFcXvqtahA40iuTz1SeUpeetrqOIAXsEh9ihyQOdGe1cCre94Bc3TCBQwYNmPo0aO1wm8TM8-q4TLgLUm3nB5VdeHMtk2qwyjY5pYZiEMuuGEar41myvMilwO9o7Ynkuc5w1HcIstfwjlDUglZRHSlYlOWvdNwr22Km6x8WcuFU91y0JPoWyQstDLgqOg0GayGl70O8w"
+            "dir": "59dbc721ab424f00591a9b58-3",
+            "untar-dis": "auto",
+            "url": "http://www.vlsitechnology.org/pharosc_8.4.tar.gz"
         }
     ]
 }

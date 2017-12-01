@@ -97,7 +97,7 @@ if "download" in config:
                 cmd.append("--directory="+file["dir"])
 
                 #print cmd
-                untar = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+                untar = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=sys.stderr)
                 writestream = untar.stdin
             else:
                 print "using",dir+"/"+file_name
@@ -130,7 +130,16 @@ if "download" in config:
 		    print "Downloading: %s Bytes: %s" % (file_name, status)
 
             if u.getcode() == 200:
-                writestream.close()
+
+                #check tar return code
+                try:
+                    writestream.wait()
+                    code = writestream.returncode
+                except:
+                    writestream.close()
+                    code = 0
+                if code != 0:
+                    raise Exception("writestream ended with "+code)
 
                 if file_size and file_size != file_size_dl:
                     raise Exception("Couldn't download the whole file.")
