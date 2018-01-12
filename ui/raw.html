@@ -1,0 +1,77 @@
+<style>
+sca-product-raw .sca-product-raw-file {
+border-bottom: 1px solid #f0f0f0;
+}
+sca-product-raw .sca-product-raw-file:hover {
+background-color: #ddd;
+}
+sca-product-raw {
+font-size: 95%;
+}
+sca-product-raw .sca-product-raw-header {
+font-weight: bold;
+color: #999;
+}
+sca-product-raw .sca-product-raw-header,
+sca-product-raw .sca-product-raw-item {
+padding: 2px 10px;
+}
+sca-product-raw .sca-product-raw-modified {
+font-size: 90%;
+float: right;
+width: 150px;
+}
+sca-product-raw .sca-product-raw-size {
+float: right;
+width: 130px;
+}
+sca-product-raw .sca-product-raw-ctrl {
+float: right;
+width: 50px;
+}
+sca-product-raw .sca-product-raw-ctrl:hover {
+color: #008cba;
+cursor: pointer;
+}
+sca-product-raw .sca-product-raw-name {
+float: left;
+}
+sca-product-raw .sca-product-raw-name[ng-click]:hover {
+color: #008cba;
+cursor: pointer;
+}
+sca-product-raw .sca-product-raw-headers {
+border-bottom: 1px solid #ddd;
+padding-bottom: 3px;
+margin-bottom: 2px;
+}
+sca-product-raw .sca-product-raw-resourceinfo {
+margin-left: 10px;
+margin-top: 5px;
+font-size: 85%;
+color: #999;
+}
+</style>
+
+<p class="sca-product-raw-headers">
+    <span class="sca-product-raw-header sca-product-raw-modified">Modified</span>
+    <span class="sca-product-raw-header sca-product-raw-size">Size</span>
+    <span class="sca-product-raw-header sca-product-raw-name">Name</span>
+    <br clear="both">
+</p>
+<!--<p class="text-muted" ng-if-dis="loading">&nbsp;&nbsp;<i class="fa fa-cog fa-spin"></i> Loading files...</p>-->
+
+<!--show root-->
+<sca-product-raw-dir ng-if="resource_detail" indent="1" task="task" path="path"></sca-product-raw-dir>
+
+<!--resource info-->
+<div class="sca-product-raw-resourceinfo">
+    <span ng-if="resource_detail">
+        <span class="label label-default"> <i class="fa fa-server" aria-hidden="true"></i> {{resource_detail.name}}</span> 
+        {{task._envs.SCA_TASK_DIR}}
+    </span>
+    <span ng-if="!resource_detail"> Not yet assigned to any resource </span>
+</div>
+
+
+
