@@ -10,19 +10,12 @@ import shutil
 import subprocess
 import cgi
 
-print "starting service"
+print "Starting service"
 
 block_sz = 16*1024
 
-#didn't cure the problem..
-#os.environ["LANG"] = "en_US.UTF-8"
-#need to set it to UTF_8 to prevent
-#'ascii' codec can't decode byte 0xc3 in position 1: ordinal not in range(128)
-#tarfile.ENCODING="UTF-8"
-
 with open('config.json') as config_json:
     config = json.load(config_json)
-
 
 opcount = 0 #number of requested operations
 success = 0 #number of request successfully fulfilled
@@ -56,6 +49,7 @@ if "download" in config:
             None
 
         #TODO - should I default it to "."?
+        #TODO - I think I should restrict dir to be under current directory
         dir=file["dir"]
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -85,22 +79,21 @@ if "download" in config:
 
             #create writestream 
             if "untar" in file:
-                print "untar requested for download"
+                print "Un-tarring", file["untar"]
                 cmd = ["tar", "-x"]
-                ext = file["untar"]
 
+                #guess which extraction option to use for tar
+                ext = file["untar"]
                 if ext == "auto":
                     ext = os.path.splitext(file_name)[1][1:]
-                    #print "auto-detecting untar ext",file_name, ext
-
                 ext2taropt(ext, cmd)
-                cmd.append("--directory="+file["dir"])
 
-                #print cmd
+                cmd.append("--directory="+dir)
+
                 untar = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=sys.stderr)
                 writestream = untar.stdin
             else:
-                print "using",dir+"/"+file_name
+                print "Using",dir+"/"+file_name
                 writestream = open(dir+'/'+file_name, 'w')
 
             #commencing download 
@@ -124,10 +117,10 @@ if "download" in config:
 
                     progress_time = time.time()
                     if file_size:
-                        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+                        status = r"%10d bytes [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
                     else:
-                        status = r"%10d" % (file_size_dl)
-		    print "Downloading: %s Bytes: %s" % (file_name, status)
+                        status = r"%10d bytes" % (file_size_dl)
+		    print "Downloading %s (%s)" % (file_name, status)
 
             if u.getcode() == 200:
 
@@ -147,11 +140,6 @@ if "download" in config:
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"progress": 1, "status": "finished"});
 
-
-                #if "untar" not in file:
-                #    products.append({"filename": dir+"/"+file_name, "size": file_size_dl})
-                #else:
-                #    products.append({"dirname": dir})
                 print "Successfully downloaded"
                 success += 1
             else:
@@ -279,7 +267,6 @@ if "tar" in config:
             cmd.append(os.path.basename(src))
             #print cmd
 
-            #TODO python tarfile is slow - maybe I should just drop to shell to run tar -cf..
             #now create tar file
             retcode = subprocess.call(cmd)
             if retcode == 0: 
@@ -307,6 +294,8 @@ if "untar" in config:
         src = file["src"]
         dest = file["dest"]
         print "Handling untar", file
+
+        #src/dest sent to Popen cmd array.. validate? (I think popen makes sure that each token are string, but paths themselves should be under workdir?)
 
         #make sure dest dir exists
         if not os.path.isdir(dest):
