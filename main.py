@@ -79,8 +79,8 @@ if "download" in config:
 
             #create writestream 
             if "untar" in file:
-                print "Un-tarring", file["untar"]
-                cmd = ["tar", "-x"]
+                #print "Un-tarring", file["untar"]
+                cmd = ["tar", "-v", "-x"]
 
                 #guess which extraction option to use for tar
                 ext = file["untar"]
@@ -306,7 +306,7 @@ if "untar" in config:
             progress_url = os.environ["PROGRESS_URL"]+".untar"+str(success);
             requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
         try:
-            cmd = ["tar", "-x"]
+            cmd = ["tar", "-v", "-x"]
             if "opts" in file:
 
                 ext = file["opts"]
