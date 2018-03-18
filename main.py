@@ -137,6 +137,9 @@ if "download" in config:
                 if file_size and file_size != file_size_dl:
                     raise Exception("Couldn't download the whole file.")
 
+                if file_size_dl == 0:
+                    raise Exception("too small?")
+
                 if "PROGRESS_URL" in os.environ:
                     requests.post(progress_url, json={"progress": 1, "status": "finished"});
 
