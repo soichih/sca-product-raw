@@ -54,9 +54,9 @@ if "download" in config:
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-        if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".file"+str(success);
-            requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
+        #if "PROGRESS_URL" in os.environ:
+        #    progress_url = os.environ["PROGRESS_URL"]+".file"+str(success);
+        #    requests.post(progress_url, json={"status": "running", "progress": 0, "name": url});
 
         try:
             u = urllib2.urlopen(url)
@@ -109,11 +109,11 @@ if "download" in config:
 
                 #report progress
                 if time.time() - progress_time > 0.5:
-                    if "PROGRESS_URL" in os.environ:
-                        if file_size:
-                            requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
-                        else:
-                            requests.post(progress_url, json={"msg": "Downloaded "+str(file_size_dl)+ " -- total size unknown"})
+                    #if "PROGRESS_URL" in os.environ:
+                    #    if file_size:
+                    #        requests.post(progress_url, json={"progress": float(file_size_dl)/file_size})
+                    #    else:
+                    #        requests.post(progress_url, json={"msg": "Downloaded "+str(file_size_dl)+ " -- total size unknown"})
 
                     progress_time = time.time()
                     if file_size:
@@ -140,21 +140,21 @@ if "download" in config:
                 if file_size_dl == 0:
                     raise Exception("too small?")
 
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                #if "PROGRESS_URL" in os.environ:
+                #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
 
                 print "Successfully downloaded"
                 success += 1
             else:
                 print "Download failed with code %d" % (u.getcode())
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"status": "failed", "msg": "non-200"})
+                #if "PROGRESS_URL" in os.environ:
+                #    requests.post(progress_url, json={"status": "failed", "msg": "non-200"})
 
         except Exception as e:
             print "failed to download "+url
             print e 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #(experimental)
 #symlink files from local directory to task directory (dest is optional)
@@ -167,9 +167,9 @@ if "symlink" in config:
         print "Handling symlink request",file
         src = file["src"]
 
-        if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(success);
-            requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+        #if "PROGRESS_URL" in os.environ:
+        #    progress_url = os.environ["PROGRESS_URL"]+".symlink"+str(success);
+        #    requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
 
         try:
             dest = src.split('/')[-1]
@@ -186,24 +186,22 @@ if "symlink" in config:
             try:
 		src = os.path.abspath(src)
                 os.symlink(src, dest)
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
-                #products.append({"filename": dest})
+                #if "PROGRESS_URL" in os.environ:
+                #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
                 success+=1
             except OSError, e:
                 if e.errno == errno.EEXIST:
                     os.remove(dest)
                     os.symlink(src, dest)
-                    if "PROGRESS_URL" in os.environ:
-                        requests.post(progress_url, json={"progress": 1, "status": "finished"});
-                    #products.append({"filename": dest})
+                    #if "PROGRESS_URL" in os.environ:
+                    #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
                     success+=1
 
         except Exception as e:
             print "failed to symlink:"+src
             print e 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 if "copy" in config:
     for file in config["copy"]:
@@ -212,9 +210,10 @@ if "copy" in config:
         print "Handling copy request",file
         src = file["src"]
 
-        if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".copy"+str(success);
-            requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+        #if "PROGRESS_URL" in os.environ:
+        #    progress_url = os.environ["PROGRESS_URL"]+".copy"+str(success);
+        #    requests.post(progress_url, json={"status": "running", "progress": 0, "name": src});
+
         try:
             dest = src.split('/')[-1]
             if "dest" in file:
@@ -228,16 +227,15 @@ if "copy" in config:
                     os.makedirs(dirname)            
 
             shutil.copyfile(src, dest)
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            #products.append({"filename": dest})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
             success += 1
 
         except Exception as e:
             print "failed to copy:"+src
             print e 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #create tar file from local directory 
 if "tar" in config:
@@ -248,9 +246,10 @@ if "tar" in config:
         dest = file["dest"]
         print "Handling tar request",file
 
-        if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".tar"+str(success);
-            requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
+        #if "PROGRESS_URL" in os.environ:
+        #    progress_url = os.environ["PROGRESS_URL"]+".tar"+str(success);
+        #    requests.post(progress_url, json={"status": "running", "progress": 0, "name": "tarring "+src+" to "+dest});
+
         try:
 
             #taropt can be "gz" or "bz2"..
@@ -275,17 +274,18 @@ if "tar" in config:
             if retcode == 0: 
                 #products.append({"filename": dest})
                 success+=1
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
-            else:
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"status": "failed"});
+                #if "PROGRESS_URL" in os.environ:
+                #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+
+            #else:
+            #    if "PROGRESS_URL" in os.environ:
+            #        requests.post(progress_url, json={"status": "failed"});
                  
         except Exception as e:
             print "failed to tar:"+src
             print e 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #untar .tar.gz to local directory
 #This is not necessary an import functionality, and maintly exists for scott's backup tool 
@@ -305,9 +305,10 @@ if "untar" in config:
             print "creating dest dir:",dest
             os.makedirs(dest)            
 
-        if "PROGRESS_URL" in os.environ:
-            progress_url = os.environ["PROGRESS_URL"]+".untar"+str(success);
-            requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
+        #if "PROGRESS_URL" in os.environ:
+        #    progress_url = os.environ["PROGRESS_URL"]+".untar"+str(success);
+        #    requests.post(progress_url, json={"status": "running", "progress": 0, "name": "un-tarring "+src+" to "+dest});
+
         try:
             cmd = ["tar", "-v", "-x"]
             if "opts" in file:
@@ -325,22 +326,22 @@ if "untar" in config:
             #print cmd
             retcode = subprocess.call(cmd)
             if retcode == 0: 
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"progress": 1, "status": "finished"});
+                #if "PROGRESS_URL" in os.environ:
+                #    requests.post(progress_url, json={"progress": 1, "status": "finished"});
 
                 #TODO - dest only points to where we are unarchiving. 
                 #I should add the base directory name inside the ardhive?
                 #products.append({"filename": dest})
                 success+=1
-            else:
-                if "PROGRESS_URL" in os.environ:
-                    requests.post(progress_url, json={"status": "failed"});
+            #else:
+            #    if "PROGRESS_URL" in os.environ:
+            #        requests.post(progress_url, json={"status": "failed"});
 
         except Exception as e:
             print "failed to untar:"+src
             print e 
-            if "PROGRESS_URL" in os.environ:
-                requests.post(progress_url, json={"status": "failed", "msg": str(e)})
+            #if "PROGRESS_URL" in os.environ:
+            #    requests.post(progress_url, json={"status": "failed", "msg": str(e)})
 
 #with open("product.json", "w") as fp:
 #    json.dump({"type": "raw", "files":products}, fp)
