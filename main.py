@@ -356,4 +356,7 @@ else:
     f.write('0')
 f.close()
 
+#attempt to prevent odd issue of status.sh not picking up the finished file
+time.sleep(3)
+
 
